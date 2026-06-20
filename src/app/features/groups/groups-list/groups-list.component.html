@@ -8,8 +8,7 @@
       [columns]="columns"
       [data]="$any(groups)"
       [loading]="loading"
-      [totalCount]="groups.length"
-      [showSearch]="false"
+      searchPlaceholder="Search groups..."
       (edit)="onEdit($event)"
       (delete)="onDelete($event)"
     />

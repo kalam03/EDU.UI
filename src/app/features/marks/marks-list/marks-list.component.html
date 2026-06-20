@@ -7,8 +7,11 @@
     <div class="filter-bar">
       <div class="form-group">
         <label>Filter by Exam</label>
-        <app-searchable-dropdown [options]="examOptions" placeholder="All Exams"
-          (valueChange)="onExamSelect($event)"></app-searchable-dropdown>
+        <app-searchable-select
+          [options]="examOptions"
+          placeholder="All Exams"
+          (valueChange)="onExamSelect($event)">
+        </app-searchable-select>
       </div>
       <button class="btn btn-primary" (click)="applyFilter()">Apply</button>
     </div>
@@ -16,8 +19,8 @@
       [columns]="columns"
       [data]="$any(filtered)"
       [loading]="loading"
-      [totalCount]="filtered.length"
-      [showSearch]="false"
+      [showSearch]="true"
+      searchPlaceholder="Search marks..."
       (edit)="onEdit($event)"
       (delete)="onDelete($event)"
     />

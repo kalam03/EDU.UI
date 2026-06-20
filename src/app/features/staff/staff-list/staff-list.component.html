@@ -6,9 +6,8 @@
   <div class="panel-body">
     <app-data-table
       [columns]="columns"
-      [data]="$any(filtered)"
+      [data]="$any(staff)"
       [loading]="loading"
-      [totalCount]="filtered.length"
       searchPlaceholder="Search staff..."
       (edit)="onEdit($event)"
       (delete)="onDelete($event)"

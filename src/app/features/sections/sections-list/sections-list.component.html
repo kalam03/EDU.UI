@@ -8,8 +8,7 @@
       [columns]="columns"
       [data]="$any(sections)"
       [loading]="loading"
-      [totalCount]="sections.length"
-      [showSearch]="false"
+      searchPlaceholder="Search sections..."
       (edit)="onEdit($event)"
       (delete)="onDelete($event)"
     />

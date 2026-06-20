@@ -6,9 +6,8 @@
   <div class="panel-body">
     <app-data-table
       [columns]="columns"
-      [data]="$any(filtered)"
+      [data]="$any(students)"
       [loading]="loading"
-      [totalCount]="filtered.length"
       searchPlaceholder="Search by name, admission no..."
       (edit)="onEdit($event)"
       (delete)="onDelete($event)"

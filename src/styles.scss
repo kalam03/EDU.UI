@@ -62,7 +62,7 @@ textarea.form-control { height: auto; padding: 8px 12px; }
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
 }
 /* ── Panel System ── */
-.panel { background: var(--card-bg); border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 24px; border: 1px solid var(--border); }
+.panel { background: var(--card-bg); border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 24px; border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 3px solid var(--primary); }
 .panel-header { background: var(--primary); padding: 7px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 36px; border-radius: 9px 9px 0 0; }
 .panel-title { color: #fff; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
 .panel-header h2, .panel-header h3 { color: #fff; font-size: 13px; font-weight: 600; margin: 0; }
