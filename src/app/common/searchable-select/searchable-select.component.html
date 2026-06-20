@@ -1,0 +1,36 @@
+<div class="sd-wrapper" [class.open]="isOpen" [class.disabled]="disabled">
+  <div class="sd-trigger" #trigger (click)="toggleDropdown()" (keydown)="onKeyDown($event)" tabindex="0">
+    <span class="sd-label" [class.placeholder]="!selectedOption">
+      {{ selectedOption ? getLabel(selectedOption) : placeholder }}
+    </span>
+    <span class="sd-actions">
+      <button *ngIf="selectedOption" type="button" class="sd-clear" (click)="clear($event)">&#215;</button>
+      <span class="sd-arrow" [class.up]="isOpen">&#9662;</span>
+    </span>
+  </div>
+
+  <div class="sd-dropdown" *ngIf="isOpen"
+    [style.top.px]="dropTop" [style.left.px]="dropLeft" [style.width.px]="dropWidth">
+    <div class="sd-search-box">
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()"
+        placeholder="Search..."
+        class="sd-search"
+        (click)="$event.stopPropagation()"
+        (keydown)="onKeyDown($event)"
+      />
+    </div>
+    <ul class="sd-list">
+      <li *ngIf="!filteredOptions.length" class="sd-empty">No results found</li>
+      <li
+        *ngFor="let opt of filteredOptions; let i = index"
+        class="sd-option"
+        [class.highlighted]="highlightIndex === i"
+        [class.selected]="isSelected(opt)"
+        (click)="selectOption(opt)"
+      >{{ opt.label }}</li>
+    </ul>
+  </div>
+</div>

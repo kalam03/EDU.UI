@@ -1,0 +1,49 @@
+<div class="edp-wrapper">
+  <div class="edp-input-row" #inputRow [class.disabled]="disabled">
+    <input
+      type="text"
+      class="edp-text-input"
+      [value]="inputValue"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      maxlength="10"
+      (input)="onInputChange($any($event.target).value)"
+      (keydown)="onInputKeydown($event)"
+      (blur)="onTouched()" />
+    <button *ngIf="inputValue" type="button" class="edp-clear" (click)="clear($event)" title="Clear">&#x2715;</button>
+    <button type="button" class="edp-icon-btn" [disabled]="disabled" (click)="openCalendar($event)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+    </button>
+  </div>
+
+  <div class="edp-calendar" *ngIf="isOpen"
+    [style.top.px]="calTop" [style.left.px]="calLeft" [style.width.px]="calWidth">
+    <div class="edp-cal-header">
+      <button type="button" class="edp-nav" (click)="prevMonth()">&#8249;</button>
+      <span class="edp-month-label">{{ monthLabel }}</span>
+      <button type="button" class="edp-nav" (click)="nextMonth()">&#8250;</button>
+    </div>
+    <div class="edp-day-names">
+      <span *ngFor="let d of dayNames">{{ d }}</span>
+    </div>
+    <div class="edp-days">
+      <span
+        *ngFor="let day of calendarDays"
+        class="edp-day"
+        [class.empty]="!day"
+        [class.selected]="isSelected(day)"
+        [class.today]="isToday(day)"
+        (click)="selectDay(day)">
+        {{ day ? day.getDate() : '' }}
+      </span>
+    </div>
+    <div class="edp-cal-footer">
+      <button type="button" class="edp-today-btn" (click)="selectToday()">Today</button>
+    </div>
+  </div>
+</div>

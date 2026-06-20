@@ -49,6 +49,36 @@
 
 .table-container { overflow-x: auto; }
 
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead th {
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 14px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+    &:hover { background: var(--bg); }
+  }
+
+  tbody td {
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+}
+
 .table-loading {
   display: flex;
   flex-direction: column;
