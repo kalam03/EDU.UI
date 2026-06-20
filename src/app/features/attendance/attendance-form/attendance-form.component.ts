@@ -7,48 +7,60 @@ import { ClassService } from '../../../core/services/class.service';
 import { SectionService } from '../../../core/services/section.service';
 import { StudentService } from '../../../core/services/student.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { EduClass, Section, Student } from '../../../core/models';
-import { CustomDatepickerComponent } from '../../../shared/components/custom-datepicker/custom-datepicker.component';
-import { SearchableDropdownComponent, DropdownOption } from '../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import { EditableDatepickerComponent } from '../../../common/editable-datepicker/editable-datepicker.component';
+import { SearchableSelectComponent, SelectOption } from '../../../common/searchable-select/searchable-select.component';
 
 interface AttendanceRow { studentId: number; studentName: string; status: string; note: string; }
 
 @Component({
   selector: 'app-attendance-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, CustomDatepickerComponent, SearchableDropdownComponent],
+  imports: [CommonModule, FormsModule, RouterLink, EditableDatepickerComponent, SearchableSelectComponent],
   templateUrl: './attendance-form.component.html',
   styleUrl: './attendance-form.component.scss'
 })
 export class AttendanceFormComponent implements OnInit {
   private attendanceService = inject(AttendanceService);
-  private classService = inject(ClassService);
-  private sectionService = inject(SectionService);
-  private studentService = inject(StudentService);
-  private router = inject(Router);
-  private authService = inject(AuthService);
+  private classService     = inject(ClassService);
+  private sectionService   = inject(SectionService);
+  private studentService   = inject(StudentService);
+  private router           = inject(Router);
+  private authService      = inject(AuthService);
 
-  classes: EduClass[] = [];
-  sections: Section[] = [];
-  selectedClassId: number | null = null;
+  classOptions:   SelectOption[] = [];
+  sectionOptions: SelectOption[] = [];
+  selectedClassId:   number | null = null;
   selectedSectionId: number | null = null;
 
-  get classOptions(): DropdownOption[] { return this.classes.map(c => ({ value: c.classId, label: c.className || '' })); }
-  get sectionOptions(): DropdownOption[] { return this.sections.map(s => ({ value: s.sectionId, label: s.sectionName || '' })); }
-
-  onClassSelect(val: number | string | null): void { this.selectedClassId = val as number | null; this.onClassChange(); }
-  onSectionSelect(val: number | string | null): void { this.selectedSectionId = val as number | null; }
   attendanceDate = new Date().toISOString().split('T')[0];
   rows: AttendanceRow[] = [];
-  loading = false; saving = false; error = '';
+  loading = false;
+  saving  = false;
+  error   = '';
   studentsLoaded = false;
   statusOptions = ['Present', 'Absent', 'Late'];
 
-  ngOnInit(): void { this.classService.list().subscribe(c => this.classes = c); }
+  ngOnInit(): void {
+    this.classService.list().subscribe(c => {
+      this.classOptions = c.map(x => ({ value: x.classId, label: x.className || '' }));
+    });
+  }
 
-  onClassChange(): void {
-    this.sections = []; this.selectedSectionId = null; this.rows = []; this.studentsLoaded = false;
-    if (this.selectedClassId) this.sectionService.getByClass(this.selectedClassId).subscribe(s => this.sections = s);
+  onClassSelect(val: number | string | null): void {
+    this.selectedClassId = val as number | null;
+    this.sectionOptions = [];
+    this.selectedSectionId = null;
+    this.rows = [];
+    this.studentsLoaded = false;
+    if (this.selectedClassId) {
+      this.sectionService.getByClass(this.selectedClassId).subscribe(s => {
+        this.sectionOptions = s.map(x => ({ value: x.sectionId, label: x.sectionName || '' }));
+      });
+    }
+  }
+
+  onSectionSelect(val: number | string | null): void {
+    this.selectedSectionId = val as number | null;
   }
 
   loadStudents(): void {
@@ -59,9 +71,11 @@ export class AttendanceFormComponent implements OnInit {
         this.rows = students.map(s => ({
           studentId: s.studentId,
           studentName: `${s.firstName} ${s.lastName ?? ''}`.trim(),
-          status: 'Present', note: ''
+          status: 'Present',
+          note: ''
         }));
-        this.studentsLoaded = true; this.loading = false;
+        this.studentsLoaded = true;
+        this.loading = false;
       },
       error: () => { this.loading = false; }
     });
@@ -73,8 +87,11 @@ export class AttendanceFormComponent implements OnInit {
     if (!this.selectedClassId || !this.rows.length) return;
     this.saving = true;
     const records = this.rows.map(r => ({
-      studentId: r.studentId, attendanceDate: this.attendanceDate,
-      status: r.status, note: r.note, schoolEiin: this.authService.schoolEiin
+      studentId: r.studentId,
+      attendanceDate: this.attendanceDate,
+      status: r.status,
+      note: r.note,
+      schoolEiin: this.authService.schoolEiin
     }));
     this.attendanceService.bulkCreate(records as any).subscribe({
       next: () => this.router.navigate(['/attendance']),

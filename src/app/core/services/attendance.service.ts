@@ -7,7 +7,7 @@ import { Attendance, ApiResponse } from '../models';
 @Injectable({ providedIn: 'root' })
 export class AttendanceService extends BaseApiService<Attendance> {
   protected endpoint = 'attendances';
-  bulkCreate(records: Partial<Attendance>[]): Observable<ApiResponse<Attendance[]>> {
-    return this.http.post<ApiResponse<Attendance[]>>(this.url, records);
+  bulkCreate(records: Partial<Attendance>[]): Observable<ApiResponse<number>> {
+    return this.http.post<ApiResponse<number>>(`${this.url}/bulk`, { records });
   }
 }

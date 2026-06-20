@@ -7,17 +7,17 @@
     <div class="filter-bar">
       <div class="form-group">
         <label>Class <span class="required">*</span></label>
-        <app-searchable-dropdown [options]="classOptions" placeholder="Select Class"
-          (valueChange)="onClassSelect($event)"></app-searchable-dropdown>
+        <app-searchable-select [options]="classOptions" placeholder="Select Class"
+          (valueChange)="onClassSelect($event)"></app-searchable-select>
       </div>
       <div class="form-group">
         <label>Section</label>
-        <app-searchable-dropdown [options]="sectionOptions" placeholder="All Sections"
-          (valueChange)="onSectionSelect($event)"></app-searchable-dropdown>
+        <app-searchable-select [options]="sectionOptions" placeholder="All Sections"
+          (valueChange)="onSectionSelect($event)"></app-searchable-select>
       </div>
       <div class="form-group">
         <label>Date <span class="required">*</span></label>
-        <app-custom-datepicker [(ngModel)]="attendanceDate"></app-custom-datepicker>
+        <app-editable-datepicker [(ngModel)]="attendanceDate" (ngModelChange)="attendanceDate = $event"></app-editable-datepicker>
       </div>
       <button class="btn btn-primary" (click)="loadStudents()" [disabled]="!selectedClassId || loading">
         {{ loading ? 'Loading...' : 'Load Students' }}
@@ -41,7 +41,7 @@
               <th>#</th>
               <th>Student Name</th>
               @for (status of statusOptions; track status) {
-                <th>{{ status }}</th>
+                <th style="text-align:center;">{{ status }}</th>
               }
               <th>Note</th>
             </tr>
@@ -52,19 +52,19 @@
                 <td>{{ i + 1 }}</td>
                 <td>{{ row.studentName }}</td>
                 @for (status of statusOptions; track status) {
-                  <td style="text-align:center">
+                  <td style="text-align:center;">
                     <input type="radio" [name]="'status_' + row.studentId" [value]="status" [(ngModel)]="row.status" />
                   </td>
                 }
                 <td>
-                  <input type="text" class="form-control" style="min-width:120px" [(ngModel)]="row.note" placeholder="Optional" />
+                  <input type="text" class="form-control" style="min-width:120px;" [(ngModel)]="row.note" placeholder="Optional" />
                 </td>
               </tr>
             }
           </tbody>
         </table>
       </div>
-      <div class="panel-footer" style="margin-top:16px; padding:0; border:none; background:none; justify-content:flex-end;">
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
         <a routerLink="/attendance" class="btn btn-secondary">Cancel</a>
         <button class="btn btn-primary" (click)="onSubmit()" [disabled]="saving">
           {{ saving ? 'Saving...' : 'Save Attendance' }}
