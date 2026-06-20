@@ -10,16 +10,73 @@
       <div class="panel-body">
         @if (error) { <div class="alert alert-danger">{{ error }}</div> }
 
+        <!-- Photos -->
+        <div class="section-title">Photos</div>
+        <div class="grid-3">
+
+          <div class="image-upload-card">
+            <div class="image-upload-label">Student Photo</div>
+            <div class="image-preview-box" (click)="studentInput.click()">
+              @if (studentImagePreview) {
+                <img [src]="studentImagePreview" class="preview-img" alt="Student" />
+                <button type="button" class="remove-img-btn"
+                  (click)="removeImage('student'); $event.stopPropagation()">&#215;</button>
+              } @else {
+                <div class="upload-placeholder">
+                  <span style="font-size:36px; opacity:0.4;">&#128100;</span>
+                  <span style="font-size:12px;">Click to upload</span>
+                </div>
+              }
+            </div>
+            <input #studentInput type="file" accept="image/*" hidden
+              (change)="onFileSelect('student', $event)" />
+          </div>
+
+          <div class="image-upload-card">
+            <div class="image-upload-label">Father Photo</div>
+            <div class="image-preview-box" (click)="fatherInput.click()">
+              @if (fatherImagePreview) {
+                <img [src]="fatherImagePreview" class="preview-img" alt="Father" />
+                <button type="button" class="remove-img-btn"
+                  (click)="removeImage('father'); $event.stopPropagation()">&#215;</button>
+              } @else {
+                <div class="upload-placeholder">
+                  <span style="font-size:36px; opacity:0.4;">&#128100;</span>
+                  <span style="font-size:12px;">Click to upload</span>
+                </div>
+              }
+            </div>
+            <input #fatherInput type="file" accept="image/*" hidden
+              (change)="onFileSelect('father', $event)" />
+          </div>
+
+          <div class="image-upload-card">
+            <div class="image-upload-label">Mother Photo</div>
+            <div class="image-preview-box" (click)="motherInput.click()">
+              @if (motherImagePreview) {
+                <img [src]="motherImagePreview" class="preview-img" alt="Mother" />
+                <button type="button" class="remove-img-btn"
+                  (click)="removeImage('mother'); $event.stopPropagation()">&#215;</button>
+              } @else {
+                <div class="upload-placeholder">
+                  <span style="font-size:36px; opacity:0.4;">&#128100;</span>
+                  <span style="font-size:12px;">Click to upload</span>
+                </div>
+              }
+            </div>
+            <input #motherInput type="file" accept="image/*" hidden
+              (change)="onFileSelect('mother', $event)" />
+          </div>
+
+        </div>
+
+        <!-- Personal Information -->
         <div class="section-title">Personal Information</div>
         <div class="grid-2">
           <div class="form-group">
-            <label>Admission No <span class="required">*</span></label>
-            <input type="text" class="form-control"
-              [class.is-invalid]="form.get('admissionNo')!.invalid && form.get('admissionNo')!.touched"
-              formControlName="admissionNo" placeholder="Admission number" />
-            @if (form.get('admissionNo')!.invalid && form.get('admissionNo')!.touched) {
-              <div class="invalid-feedback">Required.</div>
-            }
+            <label>Admission No <span style="font-size:10px;color:var(--text-muted);font-weight:400;">(auto)</span></label>
+            <input type="text" class="form-control" formControlName="admissionNo"
+              style="background:#f7fafc;color:var(--text-muted);cursor:not-allowed;" readonly />
           </div>
           <div class="form-group">
             <label>Enrollment Year</label>
@@ -54,11 +111,11 @@
         <div class="grid-3">
           <div class="form-group">
             <label>Date of Birth</label>
-            <app-custom-datepicker formControlName="dob"></app-custom-datepicker>
+            <app-editable-datepicker formControlName="dob"></app-editable-datepicker>
           </div>
           <div class="form-group">
             <label>Gender</label>
-            <app-searchable-dropdown [options]="genderOptions" formControlName="gender" placeholder="Select Gender"></app-searchable-dropdown>
+            <app-searchable-select [options]="genderOptions" formControlName="gender" placeholder="Select Gender"></app-searchable-select>
           </div>
           <div class="form-group">
             <label>Mobile</label>
@@ -85,22 +142,24 @@
           <textarea class="form-control" formControlName="address" rows="2" placeholder="Full address"></textarea>
         </div>
 
+        <!-- Academic Information -->
         <div class="section-title">Academic Information</div>
         <div class="grid-3">
           <div class="form-group">
             <label>Class</label>
-            <app-searchable-dropdown [options]="classOptions" formControlName="classId" placeholder="Select Class" (ngModelChange)="onClassChange($event)"></app-searchable-dropdown>
+            <app-searchable-select [options]="classOptions" formControlName="classId" placeholder="Select Class" (valueChange)="onClassChange($any($event))"></app-searchable-select>
           </div>
           <div class="form-group">
             <label>Section</label>
-            <app-searchable-dropdown [options]="sectionOptions" formControlName="sectionId" placeholder="Select Section"></app-searchable-dropdown>
+            <app-searchable-select [options]="sectionOptions" formControlName="sectionId" placeholder="Select Section"></app-searchable-select>
           </div>
           <div class="form-group">
             <label>Group</label>
-            <app-searchable-dropdown [options]="groupOptions" formControlName="groupId" placeholder="No Group"></app-searchable-dropdown>
+            <app-searchable-select [options]="groupOptions" formControlName="groupId" placeholder="No Group"></app-searchable-select>
           </div>
         </div>
 
+        <!-- Guardian Information -->
         <div class="section-title">Guardian Information</div>
         <div class="grid-3">
           <div class="form-group">
@@ -117,6 +176,7 @@
           </div>
         </div>
       </div>
+
       <div class="panel-footer">
         <a routerLink="/students" class="btn btn-secondary">Cancel</a>
         <button type="submit" class="btn btn-primary" [disabled]="saving">

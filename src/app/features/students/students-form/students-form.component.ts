@@ -7,14 +7,14 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ClassService } from '../../../core/services/class.service';
 import { SectionService } from '../../../core/services/section.service';
 import { GroupService } from '../../../core/services/group.service';
-import { EduClass, Section, Group } from '../../../core/models';
-import { SearchableDropdownComponent, DropdownOption } from '../../../shared/components/searchable-dropdown/searchable-dropdown.component';
-import { CustomDatepickerComponent } from '../../../shared/components/custom-datepicker/custom-datepicker.component';
+import { SearchableSelectComponent, SelectOption } from '../../../common/searchable-select/searchable-select.component';
+import { EditableDatepickerComponent } from '../../../common/editable-datepicker/editable-datepicker.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-students-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableDropdownComponent, CustomDatepickerComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent, EditableDatepickerComponent],
   templateUrl: './students-form.component.html',
   styleUrl: './students-form.component.scss'
 })
@@ -33,17 +33,24 @@ export class StudentsFormComponent implements OnInit {
   saving = false;
   error = '';
 
-  classOptions: DropdownOption[] = [];
-  sectionOptions: DropdownOption[] = [];
-  groupOptions: DropdownOption[] = [];
-  genderOptions: DropdownOption[] = [
-    { value: 'Male', label: 'Male' },
+  studentImageFile: File | null = null;
+  fatherImageFile:  File | null = null;
+  motherImageFile:  File | null = null;
+  studentImagePreview: string | null = null;
+  fatherImagePreview:  string | null = null;
+  motherImagePreview:  string | null = null;
+
+  classOptions:  SelectOption[] = [];
+  sectionOptions: SelectOption[] = [];
+  groupOptions:  SelectOption[] = [];
+  genderOptions: SelectOption[] = [
+    { value: 'Male',   label: 'Male' },
     { value: 'Female', label: 'Female' },
-    { value: 'Other', label: 'Other' }
+    { value: 'Other',  label: 'Other' }
   ];
 
   form = this.fb.group({
-    admissionNo:      ['', Validators.required],
+    admissionNo:      [{ value: '', disabled: true }, Validators.required],
     firstName:        ['', Validators.required],
     lastName:         [''],
     fatherName:       [''],
@@ -72,6 +79,13 @@ export class StudentsFormComponent implements OnInit {
     });
 
     const idParam = this.route.snapshot.paramMap.get('id');
+    if (!idParam) {
+      // New student — auto-generate admission number
+      this.studentService.getNextAdmissionNo().subscribe({
+        next: no => this.form.get('admissionNo')!.setValue(no),
+        error: () => {}
+      });
+    }
     if (idParam) {
       this.id = +idParam;
       this.loading = true;
@@ -79,6 +93,10 @@ export class StudentsFormComponent implements OnInit {
         next: s => {
           this.form.patchValue(s as any);
           if (s.classId) this.onClassChange(s.classId);
+          const base = environment.apiUrl.replace('/api', '');
+          if (s.studentImage)          this.studentImagePreview = `${base}/${s.studentImage}`;
+          if ((s as any).fatherImage)  this.fatherImagePreview  = `${base}/${(s as any).fatherImage}`;
+          if ((s as any).motherImage)  this.motherImagePreview  = `${base}/${(s as any).motherImage}`;
           this.loading = false;
         },
         error: () => { this.loading = false; this.error = 'Failed to load student.'; }
@@ -98,12 +116,45 @@ export class StudentsFormComponent implements OnInit {
     });
   }
 
+  onFileSelect(type: 'student' | 'father' | 'mother', event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const preview = e.target?.result as string;
+      if (type === 'student') { this.studentImageFile = file; this.studentImagePreview = preview; }
+      if (type === 'father')  { this.fatherImageFile  = file; this.fatherImagePreview  = preview; }
+      if (type === 'mother')  { this.motherImageFile  = file; this.motherImagePreview  = preview; }
+    };
+    reader.readAsDataURL(file);
+    (event.target as HTMLInputElement).value = '';
+  }
+
+  removeImage(type: 'student' | 'father' | 'mother'): void {
+    if (type === 'student') { this.studentImageFile = null; this.studentImagePreview = null; }
+    if (type === 'father')  { this.fatherImageFile  = null; this.fatherImagePreview  = null; }
+    if (type === 'mother')  { this.motherImageFile  = null; this.motherImagePreview  = null; }
+  }
+
   onSubmit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.saving = true;
+
+    const fd = new FormData();
+    const val = this.form.getRawValue() as any; // getRawValue includes disabled controls
+    Object.keys(val).forEach(key => {
+      if (val[key] !== null && val[key] !== undefined && val[key] !== '') {
+        fd.append(key, String(val[key]));
+      }
+    });
+    if (this.studentImageFile) fd.append('studentImage', this.studentImageFile);
+    if (this.fatherImageFile)  fd.append('fatherImage',  this.fatherImageFile);
+    if (this.motherImageFile)  fd.append('motherImage',  this.motherImageFile);
+
     const obs = this.isEdit
-      ? this.studentService.update(this.id!, this.form.value as any)
-      : this.studentService.create(this.form.value as any);
+      ? this.studentService.updateMultipart(this.id!, fd)
+      : this.studentService.createMultipart(fd);
+
     obs.subscribe({
       next: () => this.router.navigate(['/students']),
       error: err => { this.saving = false; this.error = err?.error?.message ?? 'Save failed.'; }
