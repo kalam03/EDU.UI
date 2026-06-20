@@ -1,0 +1,29 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+  <div class="sidebar-header">
+    <div class="logo">
+      <span class="logo-icon">&#127979;</span>
+      @if (!collapsed) {
+        <span class="logo-text">EDU</span>
+      }
+    </div>
+    <button class="collapse-btn" (click)="toggleCollapse.emit()">
+      {{ collapsed ? '&#9654;' : '&#9664;' }}
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    @for (item of navItems; track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        class="nav-item"
+        [title]="collapsed ? item.label : ''"
+      >
+        <span class="nav-icon" [innerHTML]="item.icon"></span>
+        @if (!collapsed) {
+          <span class="nav-label">{{ item.label }}</span>
+        }
+      </a>
+    }
+  </nav>
+</aside>

@@ -1,0 +1,112 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">School Information</span>
+  </div>
+  @if (loading) {
+    <div class="panel-body"><div class="form-loading">Loading...</div></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="panel-body">
+        @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+        @if (success) { <div class="alert alert-success">{{ success }}</div> }
+
+        <div class="section-title">Basic Information</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>School Name <span class="required">*</span></label>
+            <input type="text" class="form-control"
+              [class.is-invalid]="form.get('schoolName')!.invalid && form.get('schoolName')!.touched"
+              formControlName="schoolName" placeholder="Full school name" />
+            @if (form.get('schoolName')!.invalid && form.get('schoolName')!.touched) {
+              <div class="invalid-feedback">Required.</div>
+            }
+          </div>
+          <div class="form-group">
+            <label>School EIIN <span class="required">*</span></label>
+            <input type="text" class="form-control"
+              [class.is-invalid]="form.get('schoolEiin')!.invalid && form.get('schoolEiin')!.touched"
+              formControlName="schoolEiin" placeholder="School EIIN code" />
+            @if (form.get('schoolEiin')!.invalid && form.get('schoolEiin')!.touched) {
+              <div class="invalid-feedback">Required.</div>
+            }
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>School Type</label>
+            <input type="text" class="form-control" formControlName="schoolType" placeholder="e.g. Government, Private" />
+          </div>
+          <div class="form-group">
+            <label>Established Year</label>
+            <input type="text" class="form-control" formControlName="establishedYear" placeholder="e.g. 1985" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <textarea class="form-control" formControlName="address" rows="2" placeholder="Full address"></textarea>
+        </div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>District</label>
+            <input type="text" class="form-control" formControlName="district" placeholder="District" />
+          </div>
+          <div class="form-group">
+            <label>Thana</label>
+            <input type="text" class="form-control" formControlName="thana" placeholder="Thana" />
+          </div>
+          <div class="form-group">
+            <label>Post Code</label>
+            <input type="text" class="form-control" formControlName="postCode" placeholder="Post code" />
+          </div>
+        </div>
+
+        <div class="section-title">Contact Information</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" class="form-control" formControlName="phone" placeholder="+880..." />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control"
+              [class.is-invalid]="form.get('email')!.invalid && form.get('email')!.touched"
+              formControlName="email" placeholder="info@school.edu" />
+            @if (form.get('email')!.invalid && form.get('email')!.touched) {
+              <div class="invalid-feedback">Valid email required.</div>
+            }
+          </div>
+          <div class="form-group">
+            <label>Website</label>
+            <input type="url" class="form-control" formControlName="website" placeholder="https://school.edu" />
+          </div>
+        </div>
+
+        <div class="section-title">Principal Information</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Principal Name</label>
+            <input type="text" class="form-control" formControlName="principalName" placeholder="Principal's full name" />
+          </div>
+          <div class="form-group">
+            <label>Principal Phone</label>
+            <input type="tel" class="form-control" formControlName="principalPhone" placeholder="+880..." />
+          </div>
+          <div class="form-group">
+            <label>Principal Email</label>
+            <input type="email" class="form-control"
+              [class.is-invalid]="form.get('principalEmail')!.invalid && form.get('principalEmail')!.touched"
+              formControlName="principalEmail" placeholder="principal@school.edu" />
+            @if (form.get('principalEmail')!.invalid && form.get('principalEmail')!.touched) {
+              <div class="invalid-feedback">Valid email required.</div>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          {{ saving ? 'Saving...' : 'Update School Info' }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

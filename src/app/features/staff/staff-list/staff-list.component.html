@@ -1,0 +1,17 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Staff</span>
+    <a routerLink="/staff/new" class="btn-outline-light">+ Add Staff</a>
+  </div>
+  <div class="panel-body">
+    <app-data-table
+      [columns]="columns"
+      [data]="$any(filtered)"
+      [loading]="loading"
+      [totalCount]="filtered.length"
+      searchPlaceholder="Search staff..."
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+    />
+  </div>
+</div>

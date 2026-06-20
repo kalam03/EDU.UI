@@ -1,0 +1,195 @@
+.edp-wrapper {
+  position: relative;
+  display: block;
+}
+
+.edp-input-row {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  height: 36px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+
+  &:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+  }
+
+  &.disabled {
+    background: #f7fafc;
+    cursor: not-allowed;
+  }
+}
+
+.edp-text-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 0 12px;
+  height: 36px;
+  font-size: 13px;
+  background: transparent;
+  color: var(--text);
+  font-family: 'Consolas', 'Courier New', monospace;
+  letter-spacing: 0.5px;
+  min-width: 0;
+
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--text-muted);
+  }
+
+  &::placeholder {
+    color: #a0aec0;
+    font-family: 'Segoe UI', sans-serif;
+    letter-spacing: 0;
+  }
+}
+
+.edp-clear {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 6px;
+  line-height: 1;
+  transition: color 0.15s;
+
+  &:hover { color: var(--danger); }
+}
+
+.edp-icon-btn {
+  background: none;
+  border: none;
+  border-left: 1px solid #e2e8f0;
+  padding: 0 10px;
+  height: 36px;
+  cursor: pointer;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  transition: background 0.15s;
+  flex-shrink: 0;
+
+  &:hover { background: #ebf8ff; }
+  &:disabled { cursor: not-allowed; opacity: 0.45; }
+}
+
+.edp-calendar {
+  position: fixed;
+  z-index: 9999;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.13);
+  width: 272px;
+  overflow: hidden;
+}
+
+.edp-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  background: var(--primary);
+  color: #fff;
+}
+
+.edp-month-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.edp-nav {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 22px;
+  padding: 0 6px;
+  line-height: 1;
+  transition: color 0.15s;
+
+  &:hover { color: #fff; }
+}
+
+.edp-day-names {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 8px 10px 4px;
+  background: #f8fafc;
+
+  span {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+}
+
+.edp-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 4px 10px 8px;
+  gap: 1px;
+}
+
+.edp-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 50%;
+  color: var(--text);
+  transition: all 0.15s;
+
+  &:hover:not(.empty) {
+    background: #ebf8ff;
+    color: var(--accent);
+  }
+
+  &.selected {
+    background: var(--primary) !important;
+    color: #fff !important;
+    font-weight: 600;
+  }
+
+  &.today {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  &.empty { cursor: default; }
+}
+
+.edp-cal-footer {
+  padding: 8px 10px 12px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #e2e8f0;
+}
+
+.edp-today-btn {
+  background: none;
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  border-radius: 6px;
+  padding: 4px 20px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+}

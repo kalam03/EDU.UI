@@ -1,0 +1,39 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">{{ isEdit ? 'Edit Group' : 'Add Group' }}</span>
+    <a routerLink="/groups" class="btn-outline-light">&#8592; Back</a>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="panel-body">
+      @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Group Name <span class="required">*</span></label>
+          <input type="text" class="form-control"
+            [class.is-invalid]="form.get('groupName')!.invalid && form.get('groupName')!.touched"
+            formControlName="groupName" placeholder="e.g. Science, Commerce, Arts" />
+          @if (form.get('groupName')!.invalid && form.get('groupName')!.touched) {
+            <div class="invalid-feedback">Group name is required.</div>
+          }
+        </div>
+        <div class="form-group">
+          <label>Class <span class="required">*</span></label>
+          <app-searchable-dropdown [options]="classOptions" formControlName="classId" placeholder="Select Class"></app-searchable-dropdown>
+          @if (form.get('classId')!.invalid && form.get('classId')!.touched) {
+            <div class="invalid-feedback">Class is required.</div>
+          }
+        </div>
+      </div>
+      <div class="form-group">
+        <label>School EIIN</label>
+        <input type="text" class="form-control" formControlName="schoolEiin" placeholder="School EIIN" />
+      </div>
+    </div>
+    <div class="panel-footer">
+      <a routerLink="/groups" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary" [disabled]="saving">
+        {{ saving ? 'Saving...' : (isEdit ? 'Update Group' : 'Add Group') }}
+      </button>
+    </div>
+  </form>
+</div>

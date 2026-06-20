@@ -1,0 +1,90 @@
+<div class="dashboard">
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <span class="date">{{ today | date:'fullDate' }}</span>
+  </div>
+
+  @if (loading) {
+    <div class="loading-grid">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="stat-card skeleton"></div>
+      }
+    </div>
+  } @else {
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon">&#127891;</div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.totalStudents | number }}</div>
+          <div class="stat-label">Total Students</div>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">&#128104;&#8205;&#127979;</div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.totalStaff | number }}</div>
+          <div class="stat-label">Total Staff</div>
+        </div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon">&#127970;</div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.totalClasses | number }}</div>
+          <div class="stat-label">Total Classes</div>
+        </div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon">&#128218;</div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.totalSubjects | number }}</div>
+          <div class="stat-label">Total Subjects</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="card attendance-card">
+        <h3>Today's Attendance</h3>
+        <div class="attendance-bar">
+          <div class="bar-fill present" [style.width.%]="attendancePercent"></div>
+        </div>
+        <div class="attendance-legend">
+          <span class="legend-item present">
+            <span class="dot"></span>Present: {{ stats.presentToday }}
+          </span>
+          <span class="legend-item absent">
+            <span class="dot"></span>Absent: {{ stats.absentToday }}
+          </span>
+          <span class="percent">{{ attendancePercent }}%</span>
+        </div>
+      </div>
+
+      <div class="card fees-card">
+        <h3>Fee Collection</h3>
+        <div class="attendance-bar">
+          <div class="bar-fill collected" [style.width.%]="feesCollectionPercent"></div>
+        </div>
+        <div class="attendance-legend">
+          <span class="legend-item present">
+            <span class="dot collected"></span>Collected: {{ stats.feesCollected | currency:'BDT ':'symbol':'1.0-0' }}
+          </span>
+          <span class="legend-item absent">
+            <span class="dot absent"></span>Pending: {{ stats.feesPending | currency:'BDT ':'symbol':'1.0-0' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card quick-links-card">
+      <h3>Quick Actions</h3>
+      <div class="quick-links">
+        @for (link of quickLinks; track link.route) {
+          <a [routerLink]="link.route" class="quick-link" [style.--color]="link.color">
+            <span class="ql-icon" [innerHTML]="link.icon"></span>
+            <span class="ql-label">{{ link.label }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  }
+</div>

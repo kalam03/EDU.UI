@@ -1,0 +1,17 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Sections</span>
+    <a routerLink="/sections/new" class="btn-outline-light">+ Add Section</a>
+  </div>
+  <div class="panel-body">
+    <app-data-table
+      [columns]="columns"
+      [data]="$any(sections)"
+      [loading]="loading"
+      [totalCount]="sections.length"
+      [showSearch]="false"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+    />
+  </div>
+</div>

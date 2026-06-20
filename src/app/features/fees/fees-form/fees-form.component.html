@@ -1,0 +1,65 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">{{ isEdit ? 'Edit Fee Payment' : 'Add Fee Payment' }}</span>
+    <a routerLink="/fees" class="btn-outline-light">&#8592; Back</a>
+  </div>
+  @if (loading) {
+    <div class="panel-body"><div class="form-loading">Loading...</div></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="panel-body">
+        @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Student <span class="required">*</span></label>
+            <app-searchable-dropdown [options]="studentOptions" formControlName="studentId" placeholder="Select Student"></app-searchable-dropdown>
+            @if (form.get('studentId')!.invalid && form.get('studentId')!.touched) {
+              <div class="invalid-feedback">Student is required.</div>
+            }
+          </div>
+          <div class="form-group">
+            <label>Fee Type <span class="required">*</span></label>
+            <app-searchable-dropdown [options]="feeMasterOptions" formControlName="feeMasterId" placeholder="Select Fee Type"></app-searchable-dropdown>
+            @if (form.get('feeMasterId')!.invalid && form.get('feeMasterId')!.touched) {
+              <div class="invalid-feedback">Fee type is required.</div>
+            }
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Amount Paid (BDT) <span class="required">*</span></label>
+            <input type="number" class="form-control" formControlName="amountPaid" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>Discount (BDT)</label>
+            <input type="number" class="form-control" formControlName="discountAmount" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>Fine (BDT)</label>
+            <input type="number" class="form-control" formControlName="fineAmount" min="0" step="0.01" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Payment Date</label>
+            <app-custom-datepicker formControlName="paymentDate"></app-custom-datepicker>
+          </div>
+          <div class="form-group">
+            <label>Status <span class="required">*</span></label>
+            <app-searchable-dropdown [options]="statusOptions" formControlName="status" placeholder="Select Status"></app-searchable-dropdown>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>School EIIN</label>
+          <input type="text" class="form-control" formControlName="schoolEiin" placeholder="School EIIN" />
+        </div>
+      </div>
+      <div class="panel-footer">
+        <a routerLink="/fees" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          {{ saving ? 'Saving...' : (isEdit ? 'Update Payment' : 'Add Payment') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

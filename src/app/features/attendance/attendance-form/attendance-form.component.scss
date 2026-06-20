@@ -1,0 +1,31 @@
+.filter-card { margin-bottom: 16px; }
+.filters { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+.filters .form-group { margin-bottom: 0; min-width: 160px; }
+.load-btn { align-self: flex-end; height: 40px; }
+.required { color: var(--danger); }
+.alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+.alert-danger { background: #fed7d7; color: #9b2335; }
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.bulk-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.student-count { margin-left: auto; font-size: 13px; color: var(--text-muted); }
+.status-btn {
+  &.status-present { background: #c6f6d5; color: #276749; }
+  &.status-absent { background: #fed7d7; color: #9b2335; }
+  &.status-late { background: #fefcbf; color: #744210; }
+  &.status-excused { background: #bee3f8; color: #2a4365; }
+}
+.attendance-table-wrapper { overflow-x: auto; }
+.status-header { text-align: center; min-width: 70px; }
+.radio-cell { text-align: center; }
+.student-name { font-weight: 500; }
+.remarks-input { min-width: 150px; padding: 6px 10px; }
+.row-present td { background: rgba(198, 246, 213, 0.2); }
+.row-absent td { background: rgba(254, 215, 215, 0.2); }
+.row-late td { background: rgba(254, 252, 191, 0.2); }
+.form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }

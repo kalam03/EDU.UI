@@ -1,0 +1,62 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">&#127979;</div>
+      <h1>EDU</h1>
+      <p>School Management System</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (errorMessage) {
+        <div class="alert alert-danger">{{ errorMessage }}</div>
+      }
+
+      <div class="form-group">
+        <label>Username</label>
+        <input
+          type="text"
+          class="form-control"
+          [class.is-invalid]="username.invalid && username.touched"
+          formControlName="username"
+          placeholder="Enter your username"
+          autocomplete="username"
+        />
+        @if (username.invalid && username.touched) {
+          <div class="invalid-feedback">Username is required.</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-with-icon">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            class="form-control"
+            [class.is-invalid]="password.invalid && password.touched"
+            formControlName="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+          />
+          <button type="button" class="toggle-password" (click)="showPassword = !showPassword">
+            {{ showPassword ? '&#128065;' : '&#128064;' }}
+          </button>
+        </div>
+        @if (password.invalid && password.touched) {
+          <div class="invalid-feedback">Password must be at least 4 characters.</div>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary login-btn" [disabled]="loading">
+        @if (loading) {
+          <span class="spinner"></span> Signing in...
+        } @else {
+          Sign In
+        }
+      </button>
+    </form>
+
+    <div class="login-footer">
+      &copy; {{ year }} EDU School Management System
+    </div>
+  </div>
+</div>

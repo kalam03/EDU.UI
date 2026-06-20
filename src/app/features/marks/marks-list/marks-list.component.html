@@ -1,0 +1,25 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Marks</span>
+    <a routerLink="/marks/new" class="btn-outline-light">+ Enter Marks</a>
+  </div>
+  <div class="panel-body">
+    <div class="filter-bar">
+      <div class="form-group">
+        <label>Filter by Exam</label>
+        <app-searchable-dropdown [options]="examOptions" placeholder="All Exams"
+          (valueChange)="onExamSelect($event)"></app-searchable-dropdown>
+      </div>
+      <button class="btn btn-primary" (click)="applyFilter()">Apply</button>
+    </div>
+    <app-data-table
+      [columns]="columns"
+      [data]="$any(filtered)"
+      [loading]="loading"
+      [totalCount]="filtered.length"
+      [showSearch]="false"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+    />
+  </div>
+</div>

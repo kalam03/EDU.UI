@@ -1,0 +1,17 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Groups</span>
+    <a routerLink="/groups/new" class="btn-outline-light">+ Add Group</a>
+  </div>
+  <div class="panel-body">
+    <app-data-table
+      [columns]="columns"
+      [data]="$any(groups)"
+      [loading]="loading"
+      [totalCount]="groups.length"
+      [showSearch]="false"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+    />
+  </div>
+</div>

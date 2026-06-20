@@ -1,0 +1,43 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">{{ isEdit ? 'Edit Subject' : 'Add Subject' }}</span>
+    <a routerLink="/subjects" class="btn-outline-light">&#8592; Back</a>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="panel-body">
+      @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Subject Name <span class="required">*</span></label>
+          <input type="text" class="form-control"
+            [class.is-invalid]="form.get('subjectName')!.invalid && form.get('subjectName')!.touched"
+            formControlName="subjectName" placeholder="e.g. Mathematics, English" />
+          @if (form.get('subjectName')!.invalid && form.get('subjectName')!.touched) {
+            <div class="invalid-feedback">Subject name is required.</div>
+          }
+        </div>
+        <div class="form-group">
+          <label>Subject Code</label>
+          <input type="text" class="form-control" formControlName="subjectCode" placeholder="e.g. MATH101" />
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>School EIIN</label>
+          <input type="text" class="form-control" formControlName="schoolEiin" placeholder="School EIIN" />
+        </div>
+        <div class="form-group" style="display:flex; align-items:center; padding-top:28px;">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="isPractical" /> Practical Subject
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <a routerLink="/subjects" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary" [disabled]="saving">
+        {{ saving ? 'Saving...' : (isEdit ? 'Update Subject' : 'Add Subject') }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,75 @@
+<div class="data-table-wrapper">
+  @if (showSearch) {
+    <div class="table-toolbar">
+      <div class="search-box">
+        <span class="search-icon">&#128269;</span>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          [placeholder]="searchPlaceholder"
+          (input)="onSearch()"
+          class="search-input"
+        />
+      </div>
+      <div class="table-info">
+        Showing {{ data.length }} of {{ totalCount }} records
+      </div>
+    </div>
+  }
+
+  <div class="table-container">
+    @if (loading) {
+      <div class="table-loading">
+        <div class="spinner-large"></div>
+        <p>Loading...</p>
+      </div>
+    } @else if (data.length === 0) {
+      <div class="table-empty">
+        <div class="empty-icon">&#128202;</div>
+        <p>No records found.</p>
+      </div>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            @for (col of columns; track col.key) {
+              <th>{{ col.label }}</th>
+            }
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of data; track $index) {
+            <tr>
+              @for (col of columns; track col.key) {
+                <td>
+                  @if (col.type === 'badge' || col.type === 'boolean') {
+                    <span class="badge" [ngClass]="getBadgeClass(row, col)">
+                      {{ getCellValue(row, col) }}
+                    </span>
+                  } @else {
+                    {{ getCellValue(row, col) }}
+                  }
+                </td>
+              }
+              <td class="actions-cell">
+                <button class="btn-edit" (click)="edit.emit(row)">&#9998; Edit</button>
+                <button class="btn-del" (click)="delete.emit(row)">&#128465; Del</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  @if (totalPages > 1) {
+    <div class="pagination">
+      <button class="page-btn" [disabled]="currentPage === 1" (click)="pageChange.emit(currentPage - 1)">&#8249;</button>
+      @for (page of pages; track page) {
+        <button class="page-btn" [class.active]="page === currentPage" (click)="pageChange.emit(page)">{{ page }}</button>
+      }
+      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="pageChange.emit(currentPage + 1)">&#8250;</button>
+    </div>
+  }
+</div>

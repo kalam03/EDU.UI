@@ -1,0 +1,24 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Attendance Records</span>
+    <a routerLink="/attendance/new" class="btn-outline-light">+ Take Attendance</a>
+  </div>
+  <div class="panel-body">
+    <div class="filter-bar">
+      <div class="form-group">
+        <label>Filter by Date</label>
+        <app-custom-datepicker [(ngModel)]="filterDate" (ngModelChange)="applyFilter()"></app-custom-datepicker>
+      </div>
+      <button class="btn btn-primary" (click)="applyFilter()">Apply</button>
+    </div>
+    <app-data-table
+      [columns]="columns"
+      [data]="$any(filtered)"
+      [loading]="loading"
+      [totalCount]="filtered.length"
+      [showSearch]="false"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+    />
+  </div>
+</div>
