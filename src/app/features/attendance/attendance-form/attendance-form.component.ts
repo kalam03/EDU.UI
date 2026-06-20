@@ -6,6 +6,7 @@ import { AttendanceService } from '../../../core/services/attendance.service';
 import { ClassService } from '../../../core/services/class.service';
 import { SectionService } from '../../../core/services/section.service';
 import { StudentService } from '../../../core/services/student.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { EduClass, Section, Student } from '../../../core/models';
 import { CustomDatepickerComponent } from '../../../shared/components/custom-datepicker/custom-datepicker.component';
 import { SearchableDropdownComponent, DropdownOption } from '../../../shared/components/searchable-dropdown/searchable-dropdown.component';
@@ -25,6 +26,7 @@ export class AttendanceFormComponent implements OnInit {
   private sectionService = inject(SectionService);
   private studentService = inject(StudentService);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   classes: EduClass[] = [];
   sections: Section[] = [];
@@ -72,7 +74,7 @@ export class AttendanceFormComponent implements OnInit {
     this.saving = true;
     const records = this.rows.map(r => ({
       studentId: r.studentId, attendanceDate: this.attendanceDate,
-      status: r.status, note: r.note, schoolEiin: ''
+      status: r.status, note: r.note, schoolEiin: this.authService.schoolEiin
     }));
     this.attendanceService.bulkCreate(records as any).subscribe({
       next: () => this.router.navigate(['/attendance']),

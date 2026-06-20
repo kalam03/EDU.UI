@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { StaffService } from '../../../core/services/staff.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { CustomDatepickerComponent } from '../../../shared/components/custom-datepicker/custom-datepicker.component';
 
 @Component({
@@ -17,6 +18,7 @@ export class StaffFormComponent implements OnInit {
   private staffService = inject(StaffService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   id: number | null = null;
   loading = false; saving = false; error = '';
@@ -27,7 +29,7 @@ export class StaffFormComponent implements OnInit {
     joinDate:    [''],
     salary:      [null as number | null],
     bankAccount: [''],
-    schoolEiin:  ['']
+    schoolEiin:  [this.authService.schoolEiin]
   });
 
   get isEdit(): boolean { return this.id !== null; }

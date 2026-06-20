@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ClassService } from '../../../core/services/class.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-classes-form',
@@ -16,6 +17,7 @@ export class ClassesFormComponent implements OnInit {
   private classService = inject(ClassService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   id: number | null = null;
   loading = false;
@@ -25,7 +27,7 @@ export class ClassesFormComponent implements OnInit {
   form = this.fb.group({
     className: ['', [Validators.required, Validators.maxLength(100)]],
     classCode: [''],
-    schoolEiin: ['']
+    schoolEiin: [this.authService.schoolEiin]
   });
 
   get isEdit(): boolean { return this.id !== null; }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FeePaymentService, FeesMasterService } from '../../../core/services/fee.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { StudentService } from '../../../core/services/student.service';
 import { DropdownOption, SearchableDropdownComponent } from '../../../shared/components/searchable-dropdown/searchable-dropdown.component';
 import { CustomDatepickerComponent } from '../../../shared/components/custom-datepicker/custom-datepicker.component';
@@ -15,6 +16,7 @@ export class FeesFormComponent implements OnInit {
   private studentService = inject(StudentService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   id: number | null = null;
   loading = false; saving = false; error = '';
@@ -32,7 +34,7 @@ export class FeesFormComponent implements OnInit {
     fineAmount:     [0],
     paymentDate:    [''],
     status:         ['Unpaid', Validators.required],
-    schoolEiin:     ['']
+    schoolEiin:     [this.authService.schoolEiin]
   });
 
   get isEdit(): boolean { return this.id !== null; }

@@ -18,6 +18,7 @@ export interface LoginResponse {
   role: string;
   fullName: string;
   expiry: string;
+  schoolEiin?: string;
 }
 
 // ── Shared ────────────────────────────────────────────────────────────────────

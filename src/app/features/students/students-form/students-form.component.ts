@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { StudentService } from '../../../core/services/student.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ClassService } from '../../../core/services/class.service';
 import { SectionService } from '../../../core/services/section.service';
 import { GroupService } from '../../../core/services/group.service';
@@ -25,6 +26,7 @@ export class StudentsFormComponent implements OnInit {
   private groupService = inject(GroupService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   id: number | null = null;
   loading = false;
@@ -59,7 +61,7 @@ export class StudentsFormComponent implements OnInit {
     guardianContact:  [''],
     guardianRelation: [''],
     tuitionFee:       [null as number | null],
-    schoolEiin:       ['']
+    schoolEiin:       [this.authService.schoolEiin]
   });
 
   get isEdit(): boolean { return this.id !== null; }

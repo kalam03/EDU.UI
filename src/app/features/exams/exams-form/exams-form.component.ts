@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExamService } from '../../../core/services/exam.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ClassService } from '../../../core/services/class.service';
 import { DropdownOption, SearchableDropdownComponent } from '../../../shared/components/searchable-dropdown/searchable-dropdown.component';
 import { CustomDatepickerComponent } from '../../../shared/components/custom-datepicker/custom-datepicker.component';
@@ -11,9 +12,10 @@ import { CustomDatepickerComponent } from '../../../shared/components/custom-dat
 export class ExamsFormComponent implements OnInit {
   private fb = inject(FormBuilder); private examService = inject(ExamService);
   private classService = inject(ClassService); private route = inject(ActivatedRoute); private router = inject(Router);
+  private authService = inject(AuthService);
   id: number | null = null; loading = false; saving = false; error = '';
   classOptions: DropdownOption[] = [];
-  form = this.fb.group({ examName: ['', Validators.required], classId: [null as number | null], sectionId: [null as number | null], groupId: [null as number | null], examDate: [''], startTime: [''], endTime: [''], schoolEiin: [''] });
+  form = this.fb.group({ examName: ['', Validators.required], classId: [null as number | null], sectionId: [null as number | null], groupId: [null as number | null], examDate: [''], startTime: [''], endTime: [''], schoolEiin: [this.authService.schoolEiin] });
   get isEdit(): boolean { return this.id !== null; }
   ngOnInit(): void {
     this.classService.list().subscribe(c => { this.classOptions = c.map(x => ({ value: x.classId, label: x.className })); });

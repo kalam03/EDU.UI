@@ -21,6 +21,7 @@ export class AuthService {
   get isLoggedIn(): boolean { return !!this.token; }
   get role(): string { return this.currentUser?.role ?? ''; }
   get fullName(): string { return this.currentUser?.fullName ?? ''; }
+  get schoolEiin(): string { return this.currentUser?.schoolEiin ?? ''; }
 
   private storedUser(): LoginResponse | null {
     try {
@@ -30,13 +31,17 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
+    debugger;
     return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrl}/auth/login`, credentials).pipe(
       map(res => {
         if (!res.success || !res.data) throw new Error(res.message || 'Login failed');
         return res.data;
       }),
       tap(user => {
-        localStorage.setItem(USER_KEY, JSON.stringify(user));
+        localStorage.setItem(USER_KEY,(JSON.stringify(user)));
+         localStorage.setItem("edu_username", user.username);
+         localStorage.setItem("edu_token", user.token);
+         localStorage.setItem("edu_school_eiin", user.schoolEiin ?? '');
         this.currentUserSubject.next(user);
       })
     );

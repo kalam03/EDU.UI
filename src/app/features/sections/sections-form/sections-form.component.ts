@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SectionService } from '../../../core/services/section.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ClassService } from '../../../core/services/class.service';
 import { DropdownOption, SearchableDropdownComponent } from '../../../shared/components/searchable-dropdown/searchable-dropdown.component';
 
@@ -19,10 +20,11 @@ export class SectionsFormComponent implements OnInit {
   private classService = inject(ClassService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService);
   id: number | null = null;
   loading = false; saving = false; error = '';
   classOptions: DropdownOption[] = [];
-  form = this.fb.group({ sectionName: ['', Validators.required], classId: [null as number | null, Validators.required], schoolEiin: [''] });
+  form = this.fb.group({ sectionName: ['', Validators.required], classId: [null as number | null, Validators.required], schoolEiin: [this.authService.schoolEiin] });
   get isEdit(): boolean { return this.id !== null; }
   ngOnInit(): void {
     this.classService.list().subscribe(c => { this.classOptions = c.map(x => ({ value: x.classId, label: x.className })); });

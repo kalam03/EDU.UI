@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SubjectService } from '../../../core/services/subject.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-subjects-form',
@@ -16,13 +17,14 @@ export class SubjectsFormComponent implements OnInit {
   private subjectService = inject(SubjectService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService);
   id: number | null = null;
   loading = false; saving = false; error = '';
   form = this.fb.group({
     subjectName: ['', Validators.required],
     subjectCode: [''],
     isPractical:  [false],
-    schoolEiin:   ['']
+    schoolEiin:   [this.authService.schoolEiin]
   });
   get isEdit(): boolean { return this.id !== null; }
   ngOnInit(): void {
