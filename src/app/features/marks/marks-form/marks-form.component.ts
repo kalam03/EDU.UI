@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { MarkService } from '../../../core/services/mark.service';
 import { ExamService } from '../../../core/services/exam.service';
 import { SubjectService } from '../../../core/services/subject.service';
@@ -46,16 +47,16 @@ export class MarksFormComponent implements OnInit {
   selectedExamId:    number | null = null;
   selectedSubjectId: number | null = null;
 
-  // Plain arrays — NOT getters (getters re-create arrays every CD cycle, breaking dropdown selection)
   classOptions:   SelectOption[] = [];
   examOptions:    SelectOption[] = [];
   subjectOptions: SelectOption[] = [];
 
   markRows: MarkRow[] = [];
-  studentsLoaded = false;
-  loading = false;
-  saving  = false;
-  error   = '';
+  studentsLoaded  = false;
+  classLoading    = false;   // true while subjects + students are loading after class select
+  loading  = false;
+  saving   = false;
+  error    = '';
   editMark: Partial<Mark> = {};
 
   get isEdit(): boolean { return this.id !== null; }
@@ -82,40 +83,65 @@ export class MarksFormComponent implements OnInit {
   }
 
   onClassSelect(val: number | string | null): void {
-    this.selectedClassId = val as number | null;
-    this.subjects = [];
+    this.selectedClassId   = val as number | null;
+    this.selectedSubjectId = null;
+    this.subjects      = [];
     this.subjectOptions = [];
-    this.markRows = [];
+    this.students      = [];
+    this.markRows      = [];
     this.studentsLoaded = false;
-    if (this.selectedClassId) {
-      this.subjectService.list().subscribe(s => {
-        this.subjects = s;
-        this.subjectOptions = s.map(sub => ({ value: sub.subjectId, label: sub.subjectName || '' }));
-      });
-      this.studentService.getByClass(this.selectedClassId).subscribe(s => this.students = s);
-    }
+    this.error         = '';
+
+    if (!this.selectedClassId) return;
+
+    // Load subjects AND students in parallel — only set both once both have arrived
+    this.classLoading = true;
+    forkJoin({
+      subjects: this.subjectService.list(),
+      students: this.studentService.getByClass(this.selectedClassId)
+    }).subscribe({
+      next: ({ subjects, students }) => {
+        this.subjects      = subjects;
+        this.subjectOptions = subjects.map(s => ({ value: s.subjectId, label: s.subjectName || '' }));
+        this.students      = students;
+        this.classLoading  = false;
+      },
+      error: () => { this.classLoading = false; this.error = 'Failed to load class data.'; }
+    });
   }
 
   onExamSelect(val: number | string | null): void {
     this.selectedExamId = val as number | null;
+    this.error = '';
   }
 
   onSubjectSelect(val: number | string | null): void {
     this.selectedSubjectId = val as number | null;
-    if (val) {
-      this.markRows = this.students.map(s => ({
-        studentId:     s.studentId,
-        studentName:   `${s.firstName} ${s.lastName ?? ''}`.trim(),
-        writtenMark:   0,
-        classTestMark: 0,
-        homeworkMark:  0,
-        examTotalMark: 100
-      }));
-      this.studentsLoaded = true;
-    } else {
+    this.error = '';
+
+    if (!val) {
       this.markRows = [];
       this.studentsLoaded = false;
+      return;
     }
+
+    if (this.students.length === 0) {
+      this.error = 'No students found in this class.';
+      this.markRows = [];
+      this.studentsLoaded = false;
+      return;
+    }
+
+    // Students are guaranteed loaded (forkJoin in onClassSelect completed first)
+    this.markRows = this.students.map(s => ({
+      studentId:     s.studentId,
+      studentName:   `${s.firstName} ${s.lastName ?? ''}`.trim(),
+      writtenMark:   0,
+      classTestMark: 0,
+      homeworkMark:  0,
+      examTotalMark: 100
+    }));
+    this.studentsLoaded = true;
   }
 
   getGrade(r: MarkRow): string {
@@ -130,7 +156,11 @@ export class MarksFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.selectedExamId || !this.selectedSubjectId || !this.markRows.length) return;
+    this.error = '';
+    if (!this.selectedExamId)    { this.error = 'Please select an exam.';    return; }
+    if (!this.selectedSubjectId) { this.error = 'Please select a subject.';  return; }
+    if (!this.markRows.length)   { this.error = 'No student rows to save.';  return; }
+
     this.saving = true;
     const records = this.markRows.map(r => ({
       studentId:       r.studentId,
@@ -144,6 +174,7 @@ export class MarksFormComponent implements OnInit {
       grade:           this.getGrade(r),
       isAbsent:        false
     }));
+
     this.markService.bulkCreate(records as any).subscribe({
       next:  () => this.router.navigate(['/marks']),
       error: err => { this.saving = false; this.error = err?.error?.message ?? 'Save failed.'; }
