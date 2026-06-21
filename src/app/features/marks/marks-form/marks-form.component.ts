@@ -8,6 +8,7 @@ import { ExamService } from '../../../core/services/exam.service';
 import { SubjectService } from '../../../core/services/subject.service';
 import { StudentService } from '../../../core/services/student.service';
 import { ClassService } from '../../../core/services/class.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Exam, Subject, Student, EduClass, Mark } from '../../../core/models';
 import { SearchableSelectComponent, SelectOption } from '../../../common/searchable-select/searchable-select.component';
 
@@ -33,6 +34,7 @@ export class MarksFormComponent implements OnInit {
   private subjectService = inject(SubjectService);
   private studentService = inject(StudentService);
   private classService   = inject(ClassService);
+  private authService    = inject(AuthService);
   private router         = inject(Router);
   private route          = inject(ActivatedRoute);
 
@@ -162,6 +164,7 @@ export class MarksFormComponent implements OnInit {
     if (!this.markRows.length)   { this.error = 'No student rows to save.';  return; }
 
     this.saving = true;
+    const schoolEiin = this.authService.schoolEiin;
     const records = this.markRows.map(r => ({
       studentId:       r.studentId,
       examId:          this.selectedExamId!,
@@ -172,7 +175,8 @@ export class MarksFormComponent implements OnInit {
       obtainTotalMark: r.writtenMark + r.classTestMark + r.homeworkMark,
       examTotalMark:   r.examTotalMark,
       grade:           this.getGrade(r),
-      isAbsent:        false
+      isAbsent:        false,
+      schoolEiin
     }));
 
     this.markService.bulkCreate(records as any).subscribe({

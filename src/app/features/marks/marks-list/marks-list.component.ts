@@ -56,14 +56,15 @@ export class MarksListComponent implements OnInit {
   }
 
   onExamSelect(val: number | string | null): void {
-    this.filterExamId = (!val || val === 0) ? null : val as number;
+    const n = val !== null && val !== undefined ? Number(val) : 0;
+    this.filterExamId = n > 0 ? n : null;
     this.applyFilter();
   }
 
   applyFilter(): void {
     this.filtered = this.filterExamId
-      ? this.marks.filter(m => m.examId === this.filterExamId)
-      : this.marks;
+      ? this.marks.filter(m => Number(m.examId) === this.filterExamId)
+      : [...this.marks];
   }
 
   onEdit(row: Record<string, unknown>): void { this.router.navigate(['/marks', row['markId'], 'edit']); }

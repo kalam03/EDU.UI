@@ -56,8 +56,8 @@ export class FeesListComponent implements OnInit {
 
   applyFilter(): void {
     this.filtered = this.filterStatus
-      ? this.fees.filter(f => f.status === this.filterStatus)
-      : this.fees;
+      ? this.fees.filter(f => String(f.status).toLowerCase() === this.filterStatus.toLowerCase())
+      : [...this.fees];
   }
 
   onEdit(row: Record<string, unknown>): void { this.router.navigate(['/fees', row['paymentId'], 'edit']); }

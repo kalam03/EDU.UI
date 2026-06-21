@@ -37,8 +37,8 @@ export class AttendanceListComponent implements OnInit {
   }
   applyFilter(): void {
     this.filtered = this.filterDate
-      ? this.attendance.filter(a => a.attendanceDate === this.filterDate)
-      : this.attendance;
+      ? this.attendance.filter(a => String(a.attendanceDate).startsWith(this.filterDate))
+      : [...this.attendance];
   }
   onEdit(_row: Record<string, unknown>): void {}
   onDelete(row: Record<string, unknown>): void {
