@@ -37,29 +37,48 @@
       <div class="filter-bar">
         <div class="form-group">
           <label>Class <span class="required">*</span></label>
-          <app-searchable-dropdown [options]="classOptions" placeholder="Select Class"
-            (valueChange)="onClassSelect($event)"></app-searchable-dropdown>
+          <app-searchable-select
+            [options]="classOptions"
+            placeholder="Select Class"
+            (valueChange)="onClassSelect($event)">
+          </app-searchable-select>
         </div>
         <div class="form-group">
           <label>Exam <span class="required">*</span></label>
-          <app-searchable-dropdown [options]="examOptions" placeholder="Select Exam"
-            (valueChange)="onExamSelect($event)"></app-searchable-dropdown>
+          <app-searchable-select
+            [options]="examOptions"
+            placeholder="Select Exam"
+            (valueChange)="onExamSelect($event)">
+          </app-searchable-select>
         </div>
         <div class="form-group">
           <label>Subject <span class="required">*</span></label>
-          <app-searchable-dropdown [options]="subjectOptions" placeholder="Select Subject"
-            (valueChange)="onSubjectSelect($event)"></app-searchable-dropdown>
+          <app-searchable-select
+            [options]="subjectOptions"
+            placeholder="Select Subject"
+            (valueChange)="onSubjectSelect($event)">
+          </app-searchable-select>
         </div>
       </div>
 
       @if (error) { <div class="alert alert-danger">{{ error }}</div> }
 
-      @if (studentsLoaded) {
+      @if (studentsLoaded && markRows.length === 0) {
+        <div class="alert alert-danger">No students found in this class.</div>
+      }
+
+      @if (studentsLoaded && markRows.length > 0) {
         <div style="overflow-x:auto;">
           <table class="table">
             <thead>
               <tr>
-                <th>#</th><th>Student Name</th><th>Written</th><th>Class Test</th><th>Homework</th><th>Total</th><th>Grade</th>
+                <th>#</th>
+                <th>Student Name</th>
+                <th>Written</th>
+                <th>Class Test</th>
+                <th>Homework</th>
+                <th>Total</th>
+                <th>Grade</th>
               </tr>
             </thead>
             <tbody>
@@ -71,13 +90,17 @@
                   <td><input type="number" class="form-control" style="width:80px" [(ngModel)]="row.classTestMark" min="0" /></td>
                   <td><input type="number" class="form-control" style="width:80px" [(ngModel)]="row.homeworkMark" min="0" /></td>
                   <td><strong>{{ row.writtenMark + row.classTestMark + row.homeworkMark }}</strong></td>
-                  <td><span class="badge" [class]="getGrade(row) !== 'F' ? 'badge-success' : 'badge-danger'">{{ getGrade(row) }}</span></td>
+                  <td>
+                    <span class="badge" [ngClass]="getGrade(row) !== 'F' ? 'badge-success' : 'badge-danger'">
+                      {{ getGrade(row) }}
+                    </span>
+                  </td>
                 </tr>
               }
             </tbody>
           </table>
         </div>
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+        <div class="form-actions">
           <a routerLink="/marks" class="btn btn-secondary">Cancel</a>
           <button class="btn btn-primary" (click)="onSubmit()" [disabled]="saving">
             {{ saving ? 'Saving...' : 'Save Marks' }}

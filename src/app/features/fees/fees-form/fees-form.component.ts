@@ -5,10 +5,10 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FeePaymentService, FeesMasterService } from '../../../core/services/fee.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { StudentService } from '../../../core/services/student.service';
-import { DropdownOption, SearchableDropdownComponent } from '../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import { SelectOption, SearchableSelectComponent } from '../../../common/searchable-select/searchable-select.component';
 import { CustomDatepickerComponent } from '../../../shared/components/custom-datepicker/custom-datepicker.component';
 
-@Component({ selector: 'app-fees-form', standalone: true, imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableDropdownComponent, CustomDatepickerComponent], templateUrl: './fees-form.component.html', styleUrl: './fees-form.component.scss' })
+@Component({ selector: 'app-fees-form', standalone: true, imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent, CustomDatepickerComponent], templateUrl: './fees-form.component.html', styleUrl: './fees-form.component.scss' })
 export class FeesFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private feeService = inject(FeePaymentService);
@@ -20,9 +20,9 @@ export class FeesFormComponent implements OnInit {
 
   id: number | null = null;
   loading = false; saving = false; error = '';
-  studentOptions: DropdownOption[] = [];
-  feeMasterOptions: DropdownOption[] = [];
-  statusOptions: DropdownOption[] = [
+  studentOptions: SelectOption[] = [];
+  feeMasterOptions: SelectOption[] = [];
+  statusOptions: SelectOption[] = [
     { value: 'Unpaid', label: 'Unpaid' }, { value: 'Paid', label: 'Paid' }, { value: 'Partial', label: 'Partial' }
   ];
 

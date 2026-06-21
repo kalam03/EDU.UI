@@ -18,7 +18,7 @@
         </div>
         <div class="form-group">
           <label>Class <span class="required">*</span></label>
-          <app-searchable-dropdown [options]="classOptions" formControlName="classId" placeholder="Select Class"></app-searchable-dropdown>
+          <app-searchable-select [options]="classOptions" formControlName="classId" placeholder="Select Class"></app-searchable-select>
           @if (form.get('classId')!.invalid && form.get('classId')!.touched) {
             <div class="invalid-feedback">Class is required.</div>
           }

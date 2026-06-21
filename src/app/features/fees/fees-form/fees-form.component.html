@@ -12,14 +12,14 @@
         <div class="grid-2">
           <div class="form-group">
             <label>Student <span class="required">*</span></label>
-            <app-searchable-dropdown [options]="studentOptions" formControlName="studentId" placeholder="Select Student"></app-searchable-dropdown>
+            <app-searchable-select [options]="studentOptions" formControlName="studentId" placeholder="Select Student"></app-searchable-select>
             @if (form.get('studentId')!.invalid && form.get('studentId')!.touched) {
               <div class="invalid-feedback">Student is required.</div>
             }
           </div>
           <div class="form-group">
             <label>Fee Type <span class="required">*</span></label>
-            <app-searchable-dropdown [options]="feeMasterOptions" formControlName="feeMasterId" placeholder="Select Fee Type"></app-searchable-dropdown>
+            <app-searchable-select [options]="feeMasterOptions" formControlName="feeMasterId" placeholder="Select Fee Type"></app-searchable-select>
             @if (form.get('feeMasterId')!.invalid && form.get('feeMasterId')!.touched) {
               <div class="invalid-feedback">Fee type is required.</div>
             }
@@ -46,7 +46,7 @@
           </div>
           <div class="form-group">
             <label>Status <span class="required">*</span></label>
-            <app-searchable-dropdown [options]="statusOptions" formControlName="status" placeholder="Select Status"></app-searchable-dropdown>
+            <app-searchable-select [options]="statusOptions" formControlName="status" placeholder="Select Status"></app-searchable-select>
           </div>
         </div>
         <div class="form-group">

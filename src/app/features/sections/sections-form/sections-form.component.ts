@@ -5,12 +5,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { SectionService } from '../../../core/services/section.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ClassService } from '../../../core/services/class.service';
-import { DropdownOption, SearchableDropdownComponent } from '../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import { SelectOption, SearchableSelectComponent } from '../../../common/searchable-select/searchable-select.component';
 
 @Component({
   selector: 'app-sections-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableDropdownComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent],
   templateUrl: './sections-form.component.html',
   styleUrl: './sections-form.component.scss'
 })
@@ -23,7 +23,7 @@ export class SectionsFormComponent implements OnInit {
   private authService = inject(AuthService);
   id: number | null = null;
   loading = false; saving = false; error = '';
-  classOptions: DropdownOption[] = [];
+  classOptions: SelectOption[] = [];
   form = this.fb.group({ sectionName: ['', Validators.required], classId: [null as number | null, Validators.required], schoolEiin: [this.authService.schoolEiin] });
   get isEdit(): boolean { return this.id !== null; }
   ngOnInit(): void {
