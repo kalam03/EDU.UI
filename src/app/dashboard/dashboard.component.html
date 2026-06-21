@@ -11,6 +11,7 @@
       }
     </div>
   } @else {
+    <!-- Stats -->
     <div class="stats-grid">
       <div class="stat-card blue">
         <div class="stat-icon">&#127891;</div>
@@ -42,39 +43,52 @@
       </div>
     </div>
 
+    <!-- Attendance + Fees row -->
     <div class="row-2">
       <div class="card attendance-card">
         <h3>Today's Attendance</h3>
-        <div class="attendance-bar">
-          <div class="bar-fill present" [style.width.%]="attendancePercent"></div>
-        </div>
-        <div class="attendance-legend">
-          <span class="legend-item present">
-            <span class="dot"></span>Present: {{ stats.presentToday }}
-          </span>
-          <span class="legend-item absent">
-            <span class="dot"></span>Absent: {{ stats.absentToday }}
-          </span>
-          <span class="percent">{{ attendancePercent }}%</span>
-        </div>
+        @if (totalAttendanceToday === 0) {
+          <div class="no-data">No attendance recorded for today.</div>
+        } @else {
+          <div class="attendance-bar">
+            <div class="bar-fill present" [style.width.%]="attendancePercent"></div>
+          </div>
+          <div class="attendance-legend">
+            <span class="legend-item present">
+              <span class="dot present"></span>Present: <strong>{{ stats.presentToday }}</strong>
+            </span>
+            <span class="legend-item absent">
+              <span class="dot absent"></span>Absent: <strong>{{ stats.absentToday }}</strong>
+            </span>
+            <span class="percent">{{ attendancePercent }}%</span>
+          </div>
+          <div class="att-total">Total recorded: {{ totalAttendanceToday }}</div>
+        }
+        <a routerLink="/attendance/new" class="card-action">Take Attendance →</a>
       </div>
 
       <div class="card fees-card">
         <h3>Fee Collection</h3>
-        <div class="attendance-bar">
-          <div class="bar-fill collected" [style.width.%]="feesCollectionPercent"></div>
-        </div>
-        <div class="attendance-legend">
-          <span class="legend-item present">
-            <span class="dot collected"></span>Collected: {{ stats.feesCollected | currency:'BDT ':'symbol':'1.0-0' }}
-          </span>
-          <span class="legend-item absent">
-            <span class="dot absent"></span>Pending: {{ stats.feesPending | currency:'BDT ':'symbol':'1.0-0' }}
-          </span>
-        </div>
+        @if (stats.feesCollected === 0 && stats.feesPending === 0) {
+          <div class="no-data">No fee records found.</div>
+        } @else {
+          <div class="attendance-bar">
+            <div class="bar-fill collected" [style.width.%]="feesCollectionPercent"></div>
+          </div>
+          <div class="attendance-legend">
+            <span class="legend-item present">
+              <span class="dot collected"></span>Collected: <strong>৳{{ stats.feesCollected | number }}</strong>
+            </span>
+            <span class="legend-item absent">
+              <span class="dot absent"></span>Pending: <strong>৳{{ stats.feesPending | number }}</strong>
+            </span>
+          </div>
+        }
+        <a routerLink="/fees/new" class="card-action">Collect Fee →</a>
       </div>
     </div>
 
+    <!-- Quick actions -->
     <div class="card quick-links-card">
       <h3>Quick Actions</h3>
       <div class="quick-links">
