@@ -8,4 +8,10 @@ export class MarkService extends BaseApiService<Mark> {
   bulkCreate(records: Partial<Mark>[]): Observable<ApiResponse<number>> {
     return this.http.post<ApiResponse<number>>(`${this.url}/bulk`, { records });
   }
+  getMarksheet(studentId: number, examId: number): Observable<Blob> {
+    return this.http.get(
+      `${this.url}/marksheet?studentId=${studentId}&examId=${examId}`,
+      { responseType: 'blob' }
+    );
+  }
 }

@@ -137,6 +137,10 @@ export const routes: Routes = [
       {
         path: 'school-info',
         loadComponent: () => import('./features/school-info/school-info.component').then(m => m.SchoolInfoComponent)
+      },
+      {
+        path: 'marksheet',
+        loadComponent: () => import('./features/marksheet/marksheet.component').then(m => m.MarksheetComponent)
       }
     ]
   },

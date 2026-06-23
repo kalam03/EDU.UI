@@ -32,6 +32,7 @@ export class SidebarComponent {
     { label: 'Exams', icon: '&#128221;', route: '/exams' },
     { label: 'Marks', icon: '&#127942;', route: '/marks' },
     { label: 'Fees', icon: '&#128176;', route: '/fees' },
+    { label: 'Marksheet', icon: '&#128196;', route: '/marksheet' },
     { label: 'School Info', icon: '&#127968;', route: '/school-info' }
   ];
 }
