@@ -128,6 +128,8 @@ export interface Student {
   email?: string;
   address?: string;
   studentImage?: string;
+  fatherImage?: string;
+  motherImage?: string;
   classId?: number;
   sectionId?: number;
   groupId?: number;
