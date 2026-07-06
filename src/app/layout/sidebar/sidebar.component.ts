@@ -35,6 +35,8 @@ export class SidebarComponent {
     { label: 'Exams', icon: 'file-text', route: '/exams' },
     { label: 'Marks', icon: 'award', route: '/marks' },
     { label: 'Fees', icon: 'dollar-sign', route: '/fees' },
+    { label: 'Fee Types', icon: 'clipboard', route: '/fee-types' },
+    { label: 'Fee Dues', icon: 'trending-up', route: '/fees/dues' },
     { label: 'Marksheet', icon: 'file', route: '/marksheet' },
     { label: 'School Info', icon: 'home', route: '/school-info' }
   ];

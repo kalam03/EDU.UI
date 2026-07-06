@@ -135,6 +135,22 @@ export const routes: Routes = [
         loadComponent: () => import('./features/fees/fees-form/fees-form.component').then(m => m.FeesFormComponent)
       },
       {
+        path: 'fees/dues',
+        loadComponent: () => import('./features/fees/fee-dues/fee-dues.component').then(m => m.FeeDuesComponent)
+      },
+      {
+        path: 'fee-types',
+        loadComponent: () => import('./features/fees/fees-master-list/fees-master-list.component').then(m => m.FeesMasterListComponent)
+      },
+      {
+        path: 'fee-types/new',
+        loadComponent: () => import('./features/fees/fees-master-form/fees-master-form.component').then(m => m.FeesMasterFormComponent)
+      },
+      {
+        path: 'fee-types/:id/edit',
+        loadComponent: () => import('./features/fees/fees-master-form/fees-master-form.component').then(m => m.FeesMasterFormComponent)
+      },
+      {
         path: 'school-info',
         loadComponent: () => import('./features/school-info/school-info.component').then(m => m.SchoolInfoComponent)
       },

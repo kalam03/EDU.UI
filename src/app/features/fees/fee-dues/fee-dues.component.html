@@ -1,0 +1,114 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Student Fee Dues</span>
+    <a routerLink="/fees" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back to Fees</a>
+  </div>
+  <div class="panel-body">
+    @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+
+    <div class="filter-bar">
+      <div class="form-group">
+        <label>Class</label>
+        <app-searchable-select [options]="classOptions" placeholder="All Classes" (valueChange)="onClassSelect($any($event))"></app-searchable-select>
+      </div>
+      <div class="form-group">
+        <label>Section</label>
+        <app-searchable-select [options]="sectionOptions" placeholder="All Sections" (valueChange)="onSectionSelect($any($event))"></app-searchable-select>
+      </div>
+      <span class="due-summary">
+        Total outstanding: <strong>৳{{ totalDue | number:'1.2-2' }}</strong>
+        <span class="due-count">across {{ rows.length }} student{{ rows.length !== 1 ? 's' : '' }}</span>
+      </span>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Admission No</th>
+            <th>Student</th>
+            <th>Class</th>
+            <th>Section</th>
+            <th style="text-align:right;">Assigned</th>
+            <th style="text-align:right;">Paid</th>
+            <th style="text-align:right;">Due</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td colspan="8" class="text-center" style="padding:32px;color:var(--text-muted);">Loading...</td></tr>
+          } @else if (rows.length === 0) {
+            <tr><td colspan="8" class="text-center" style="padding:32px;color:var(--text-muted);">No students with assigned fees found for this filter.</td></tr>
+          } @else {
+            @for (row of rows; track row.studentId) {
+              <tr class="due-row" (click)="toggleDetail(row)">
+                <td>{{ row.admissionNo }}</td>
+                <td>{{ row.firstName }} {{ row.lastName ?? '' }}</td>
+                <td>{{ row.className ?? '—' }}</td>
+                <td>{{ row.sectionName ?? '—' }}</td>
+                <td style="text-align:right;">৳{{ row.totalAssigned | number:'1.2-2' }}</td>
+                <td style="text-align:right;">৳{{ row.totalPaid | number:'1.2-2' }}</td>
+                <td style="text-align:right;">
+                  <span class="badge" [ngClass]="row.totalDue > 0 ? 'badge-danger' : 'badge-success'">
+                    ৳{{ row.totalDue | number:'1.2-2' }}
+                  </span>
+                </td>
+                <td style="text-align:center;">
+                  <app-icon [name]="expandedStudentId === row.studentId ? 'chevron-up' : 'chevron-down'" [size]="14"></app-icon>
+                </td>
+              </tr>
+              @if (expandedStudentId === row.studentId) {
+                <tr class="due-detail-row">
+                  <td colspan="8">
+                    @if (detailLoading) {
+                      <div style="padding:12px;color:var(--text-muted);">Loading breakdown...</div>
+                    } @else if (detailRows.length === 0) {
+                      <div style="padding:12px;color:var(--text-muted);">No fee types apply to this student.</div>
+                    } @else {
+                      <table class="table detail-table">
+                        <thead>
+                          <tr>
+                            <th>Fee Type</th>
+                            <th>Year</th>
+                            <th style="text-align:right;">Assigned</th>
+                            <th style="text-align:right;">Discount</th>
+                            <th style="text-align:right;">Fine</th>
+                            <th style="text-align:right;">Paid</th>
+                            <th style="text-align:right;">Due</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (d of detailRows; track d.feeMasterId) {
+                            <tr>
+                              <td>{{ d.feeType }}</td>
+                              <td>{{ d.applicableYear ?? '—' }}</td>
+                              <td style="text-align:right;">৳{{ d.assigned | number:'1.2-2' }}</td>
+                              <td style="text-align:right;">৳{{ d.discount | number:'1.2-2' }}</td>
+                              <td style="text-align:right;">৳{{ d.fine | number:'1.2-2' }}</td>
+                              <td style="text-align:right;">৳{{ d.paid | number:'1.2-2' }}</td>
+                              <td style="text-align:right;">৳{{ d.due | number:'1.2-2' }}</td>
+                              <td style="text-align:center;">
+                                @if (d.due > 0) {
+                                  <a class="btn-outline-light" style="padding:2px 10px;font-size:12px;"
+                                     [routerLink]="['/fees/new']"
+                                     [queryParams]="{ studentId: row.studentId, feeMasterId: d.feeMasterId }"
+                                     (click)="$event.stopPropagation()">Pay</a>
+                                }
+                              </td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    }
+                  </td>
+                </tr>
+              }
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

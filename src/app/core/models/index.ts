@@ -219,6 +219,30 @@ export interface FeePayment {
   schoolEiin?: string;
 }
 
+// ── Student Fee Due (report) ────────────────────────────────────────────────
+export interface StudentFeeDue {
+  studentId: number;
+  admissionNo: string;
+  firstName: string;
+  lastName?: string;
+  className?: string;
+  sectionName?: string;
+  totalAssigned: number;
+  totalPaid: number;
+  totalDue: number;
+}
+
+export interface StudentFeeDueDetail {
+  feeMasterId: number;
+  feeType: string;
+  applicableYear?: string;
+  assigned: number;
+  paid: number;
+  discount: number;
+  fine: number;
+  due: number;
+}
+
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export interface DashboardStats {
   totalStudents: number;

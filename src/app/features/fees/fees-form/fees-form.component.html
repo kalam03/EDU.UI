@@ -23,8 +23,20 @@
             @if (form.get('feeMasterId')!.invalid && form.get('feeMasterId')!.touched) {
               <div class="invalid-feedback">Fee type is required.</div>
             }
+            @if (!feeMasterOptionsLoading && feeMasterOptions.length === 0) {
+              <div class="invalid-feedback" style="color:var(--text-muted);">
+                No fee types exist yet. <a routerLink="/fee-types/new">Create one first</a>.
+              </div>
+            }
           </div>
         </div>
+        @if (currentDueLoading) {
+          <div class="alert" style="background:#f1f5f9;color:var(--text-muted);">Checking current due...</div>
+        } @else if (currentDue !== null) {
+          <div class="alert" [style.background]="currentDue > 0 ? '#fff4e5' : '#e6f7ee'" [style.color]="currentDue > 0 ? '#8a5a00' : '#0a7a3f'">
+            Current outstanding due for this fee type: <strong>৳{{ currentDue | number:'1.2-2' }}</strong>
+          </div>
+        }
         <div class="grid-3">
           <div class="form-group">
             <label>Amount Paid (BDT) <span class="required">*</span></label>
@@ -41,8 +53,11 @@
         </div>
         <div class="grid-2">
           <div class="form-group">
-            <label>Payment Date</label>
+            <label>Payment Date <span class="required">*</span></label>
             <app-custom-datepicker formControlName="paymentDate"></app-custom-datepicker>
+            @if (form.get('paymentDate')!.invalid && form.get('paymentDate')!.touched) {
+              <div class="invalid-feedback">Payment date is required.</div>
+            }
           </div>
           <div class="form-group">
             <label>Status <span class="required">*</span></label>

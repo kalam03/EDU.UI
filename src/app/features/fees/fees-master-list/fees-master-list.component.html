@@ -1,0 +1,16 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Fee Types</span>
+    <a routerLink="/fee-types/new" class="btn-outline-light">+ Add Fee Type</a>
+  </div>
+  <div class="panel-body">
+    <app-data-table
+      [columns]="columns"
+      [data]="$any(feeTypes)"
+      [loading]="loading"
+      searchPlaceholder="Search fee types..."
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+    />
+  </div>
+</div>

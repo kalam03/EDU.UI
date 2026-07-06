@@ -1,0 +1,68 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">{{ isEdit ? 'Edit Fee Type' : 'Add Fee Type' }}</span>
+    <a routerLink="/fee-types" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back</a>
+  </div>
+  @if (loading) {
+    <div class="panel-body"><div class="form-loading">Loading...</div></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="panel-body">
+        @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Fee Type <span class="required">*</span></label>
+            <input type="text" class="form-control"
+              [class.is-invalid]="form.get('feeType')!.invalid && form.get('feeType')!.touched"
+              formControlName="feeType" placeholder="e.g. Tuition Fee, Admission Fee, Exam Fee" />
+            @if (form.get('feeType')!.invalid && form.get('feeType')!.touched) {
+              <div class="invalid-feedback">Fee type name is required.</div>
+            }
+          </div>
+          <div class="form-group">
+            <label>Amount (BDT) <span class="required">*</span></label>
+            <input type="number" class="form-control"
+              [class.is-invalid]="form.get('amount')!.invalid && form.get('amount')!.touched"
+              formControlName="amount" min="0" step="0.01" />
+            @if (form.get('amount')!.invalid && form.get('amount')!.touched) {
+              <div class="invalid-feedback">Enter a valid amount.</div>
+            }
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Applicable Year</label>
+            <input type="text" class="form-control" formControlName="applicableYear" placeholder="e.g. 2026" />
+          </div>
+        </div>
+
+        <div class="section-title">Restrict To (optional)</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Class</label>
+            <app-searchable-select [options]="classOptions" formControlName="classId" placeholder="All Classes" (valueChange)="onClassChange($any($event))"></app-searchable-select>
+          </div>
+          <div class="form-group">
+            <label>Section</label>
+            <app-searchable-select [options]="sectionOptions" formControlName="sectionId" placeholder="All Sections"></app-searchable-select>
+          </div>
+          <div class="form-group">
+            <label>Group</label>
+            <app-searchable-select [options]="groupOptions" formControlName="groupId" placeholder="All Groups"></app-searchable-select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>School EIIN</label>
+          <input type="text" class="form-control" formControlName="schoolEiin" placeholder="School EIIN" />
+        </div>
+      </div>
+      <div class="panel-footer">
+        <a routerLink="/fee-types" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          {{ saving ? 'Saving...' : (isEdit ? 'Update Fee Type' : 'Add Fee Type') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>
