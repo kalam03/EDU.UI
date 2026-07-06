@@ -5,17 +5,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 0 24px;
   position: sticky;
   top: 0;
   z-index: 50;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+
+  @media (max-width: 768px) {
+    padding: 0 12px;
+  }
 }
 
 .header-left {
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0;
 }
 
 .menu-btn {
@@ -23,26 +29,29 @@
   border: none;
   cursor: pointer;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--text);
+  transition: all 0.2s;
+  flex-shrink: 0;
 
-  span {
-    display: block;
-    width: 20px;
-    height: 2px;
-    background: var(--text);
-    border-radius: 2px;
-    transition: all 0.2s;
-  }
-
-  &:hover span { background: var(--accent); }
+  &:hover { background: var(--bg); color: var(--accent); }
 }
 
 .breadcrumb {
   font-size: 14px;
   color: var(--text-muted);
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (max-width: 480px) {
+    display: none;
+  }
 }
 
 .header-right {
@@ -92,6 +101,10 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--text);
+
+  @media (max-width: 480px) {
+    display: none;
+  }
 }
 
 .chevron {

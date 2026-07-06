@@ -1,0 +1,164 @@
+import { Component, OnInit, inject } from '@angular/core';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { StudentService } from '../../../core/services/student.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { ClassService } from '../../../core/services/class.service';
+import { SectionService } from '../../../core/services/section.service';
+import { GroupService } from '../../../core/services/group.service';
+import { SearchableSelectComponent, SelectOption } from '../../../common/searchable-select/searchable-select.component';
+import { EditableDatepickerComponent } from '../../../common/editable-datepicker/editable-datepicker.component';
+import { environment } from '../../../../environments/environment';
+
+@Component({
+  selector: 'app-students-form',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent, EditableDatepickerComponent],
+  templateUrl: './students-form.component.html',
+  styleUrl: './students-form.component.scss'
+})
+export class StudentsFormComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private studentService = inject(StudentService);
+  private classService = inject(ClassService);
+  private sectionService = inject(SectionService);
+  private groupService = inject(GroupService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private authService = inject(AuthService);
+
+  id: number | null = null;
+  loading = false;
+  saving = false;
+  error = '';
+
+  studentImageFile: File | null = null;
+  fatherImageFile:  File | null = null;
+  motherImageFile:  File | null = null;
+  studentImagePreview: string | null = null;
+  fatherImagePreview:  string | null = null;
+  motherImagePreview:  string | null = null;
+
+  classOptions:  SelectOption[] = [];
+  sectionOptions: SelectOption[] = [];
+  groupOptions:  SelectOption[] = [];
+  genderOptions: SelectOption[] = [
+    { value: 'Male',   label: 'Male' },
+    { value: 'Female', label: 'Female' },
+    { value: 'Other',  label: 'Other' }
+  ];
+
+  form = this.fb.group({
+    admissionNo:      [{ value: '', disabled: true }, Validators.required],
+    firstName:        ['', Validators.required],
+    lastName:         [''],
+    fatherName:       [''],
+    motherName:       [''],
+    dob:              [''],
+    gender:           [''],
+    mobileNumber:     [''],
+    email:            ['', Validators.email],
+    address:          [''],
+    classId:          [null as number | null],
+    sectionId:        [null as number | null],
+    groupId:          [null as number | null],
+    enrollmentYear:   [''],
+    guardianName:     [''],
+    guardianContact:  [''],
+    guardianRelation: [''],
+    tuitionFee:       [null as number | null],
+    schoolEiin:       [this.authService.schoolEiin]
+  });
+
+  get isEdit(): boolean { return this.id !== null; }
+
+  ngOnInit(): void {
+    this.classService.list().subscribe(c => {
+      this.classOptions = c.map(x => ({ value: x.classId, label: x.className }));
+    });
+
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (!idParam) {
+      // New student — auto-generate admission number
+      this.studentService.getNextAdmissionNo().subscribe({
+        next: no => this.form.get('admissionNo')!.setValue(no),
+        error: () => {}
+      });
+    }
+    if (idParam) {
+      this.id = +idParam;
+      this.loading = true;
+      this.studentService.fetch(this.id).subscribe({
+        next: s => {
+          this.form.patchValue(s as any);
+          if (s.classId) this.onClassChange(s.classId);
+          const base = environment.apiUrl.replace('/api', '');
+          if (s.studentImage)          this.studentImagePreview = `${base}/${s.studentImage}`;
+          if ((s as any).fatherImage)  this.fatherImagePreview  = `${base}/${(s as any).fatherImage}`;
+          if ((s as any).motherImage)  this.motherImagePreview  = `${base}/${(s as any).motherImage}`;
+          this.loading = false;
+        },
+        error: () => { this.loading = false; this.error = 'Failed to load student.'; }
+      });
+    }
+  }
+
+  onClassChange(classId: number | null): void {
+    this.sectionOptions = [];
+    this.groupOptions = [];
+    if (!classId) return;
+    this.sectionService.getByClass(classId).subscribe(s => {
+      this.sectionOptions = s.map(x => ({ value: x.sectionId, label: x.sectionName ?? '' }));
+    });
+    this.groupService.getByClass(classId).subscribe(g => {
+      this.groupOptions = g.map(x => ({ value: x.groupId, label: x.groupName ?? '' }));
+    });
+  }
+
+  onFileSelect(type: 'student' | 'father' | 'mother', event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const preview = e.target?.result as string;
+      if (type === 'student') { this.studentImageFile = file; this.studentImagePreview = preview; }
+      if (type === 'father')  { this.fatherImageFile  = file; this.fatherImagePreview  = preview; }
+      if (type === 'mother')  { this.motherImageFile  = file; this.motherImagePreview  = preview; }
+    };
+    reader.readAsDataURL(file);
+    (event.target as HTMLInputElement).value = '';
+  }
+
+  removeImage(type: 'student' | 'father' | 'mother'): void {
+    if (type === 'student') { this.studentImageFile = null; this.studentImagePreview = null; }
+    if (type === 'father')  { this.fatherImageFile  = null; this.fatherImagePreview  = null; }
+    if (type === 'mother')  { this.motherImageFile  = null; this.motherImagePreview  = null; }
+  }
+
+  onSubmit(): void {
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    this.saving = true;
+
+    const fd = new FormData();
+    const val = this.form.getRawValue() as any; // getRawValue includes disabled controls
+    Object.keys(val).forEach(key => {
+      if (val[key] !== null && val[key] !== undefined && val[key] !== '') {
+        fd.append(key, String(val[key]));
+      }
+    });
+    if (this.studentImageFile) fd.append('studentImage', this.studentImageFile);
+    if (this.fatherImageFile)  fd.append('fatherImage',  this.fatherImageFile);
+    if (this.motherImageFile)  fd.append('motherImage',  this.motherImageFile);
+
+    const obs = this.isEdit
+      ? this.studentService.updateMultipart(this.id!, fd)
+      : this.studentService.createMultipart(fd);
+
+    obs.subscribe({
+      next: () => this.router.navigate(['/students']),
+      error: err => { this.saving = false; this.error = err?.error?.message ?? 'Save failed.'; }
+    });
+  }
+}

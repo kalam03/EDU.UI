@@ -1,7 +1,7 @@
 <div class="panel">
   <div class="panel-header">
     <span class="panel-title">{{ isEdit ? 'Edit Staff' : 'Add Staff' }}</span>
-    <a routerLink="/staff" class="btn-outline-light">&#8592; Back</a>
+    <a routerLink="/staff" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back</a>
   </div>
   @if (loading) {
     <div class="panel-body"><div class="form-loading">Loading...</div></div>

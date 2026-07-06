@@ -1,7 +1,7 @@
 <div class="panel">
   <div class="panel-header">
     <span class="panel-title">{{ isEdit ? 'Edit Subject' : 'Add Subject' }}</span>
-    <a routerLink="/subjects" class="btn-outline-light">&#8592; Back</a>
+    <a routerLink="/subjects" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back</a>
   </div>
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="panel-body">

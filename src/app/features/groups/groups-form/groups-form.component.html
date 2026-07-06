@@ -1,7 +1,7 @@
 <div class="panel">
   <div class="panel-header">
     <span class="panel-title">{{ isEdit ? 'Edit Group' : 'Add Group' }}</span>
-    <a routerLink="/groups" class="btn-outline-light">&#8592; Back</a>
+    <a routerLink="/groups" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back</a>
   </div>
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="panel-body">

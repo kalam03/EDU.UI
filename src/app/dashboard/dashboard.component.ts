@@ -9,11 +9,12 @@ import { SubjectService } from '../core/services/subject.service';
 import { AttendanceService } from '../core/services/attendance.service';
 import { FeePaymentService } from '../core/services/fee.service';
 import { DashboardStats } from '../core/models';
+import { IconComponent } from '../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, IconComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -38,12 +39,12 @@ export class DashboardComponent implements OnInit {
   recentAttendance: { label: string; status: string }[] = [];
 
   quickLinks = [
-    { label: 'Add Student', route: '/students/new',    icon: '🎓', color: '#3182ce' },
-    { label: 'Add Staff',   route: '/staff/new',       icon: '👨‍🏫', color: '#38a169' },
-    { label: 'Attendance',  route: '/attendance/new',  icon: '✅', color: '#d69e2e' },
-    { label: 'Enter Marks', route: '/marks/new',       icon: '🏆', color: '#805ad5' },
-    { label: 'Collect Fee', route: '/fees/new',        icon: '💰', color: '#e53e3e' },
-    { label: 'Add Exam',    route: '/exams/new',       icon: '📝', color: '#dd6b20' }
+    { label: 'Add Student', route: '/students/new',    icon: 'graduation-cap', color: '#3182ce' },
+    { label: 'Add Staff',   route: '/staff/new',       icon: 'user-check',     color: '#38a169' },
+    { label: 'Attendance',  route: '/attendance/new',  icon: 'check-square',   color: '#d69e2e' },
+    { label: 'Enter Marks', route: '/marks/new',       icon: 'award',          color: '#805ad5' },
+    { label: 'Collect Fee', route: '/fees/new',        icon: 'dollar-sign',    color: '#e53e3e' },
+    { label: 'Add Exam',    route: '/exams/new',       icon: 'file-text',      color: '#dd6b20' }
   ];
 
   ngOnInit(): void {

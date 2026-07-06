@@ -14,28 +14,28 @@
     <!-- Stats -->
     <div class="stats-grid">
       <div class="stat-card blue">
-        <div class="stat-icon">&#127891;</div>
+        <div class="stat-icon"><app-icon name="graduation-cap" [size]="26"></app-icon></div>
         <div class="stat-info">
           <div class="stat-value">{{ stats.totalStudents | number }}</div>
           <div class="stat-label">Total Students</div>
         </div>
       </div>
       <div class="stat-card green">
-        <div class="stat-icon">&#128104;&#8205;&#127979;</div>
+        <div class="stat-icon"><app-icon name="user-check" [size]="26"></app-icon></div>
         <div class="stat-info">
           <div class="stat-value">{{ stats.totalStaff | number }}</div>
           <div class="stat-label">Total Staff</div>
         </div>
       </div>
       <div class="stat-card purple">
-        <div class="stat-icon">&#127970;</div>
+        <div class="stat-icon"><app-icon name="building" [size]="26"></app-icon></div>
         <div class="stat-info">
           <div class="stat-value">{{ stats.totalClasses | number }}</div>
           <div class="stat-label">Total Classes</div>
         </div>
       </div>
       <div class="stat-card orange">
-        <div class="stat-icon">&#128218;</div>
+        <div class="stat-icon"><app-icon name="book-open" [size]="26"></app-icon></div>
         <div class="stat-info">
           <div class="stat-value">{{ stats.totalSubjects | number }}</div>
           <div class="stat-label">Total Subjects</div>
@@ -94,7 +94,7 @@
       <div class="quick-links">
         @for (link of quickLinks; track link.route) {
           <a [routerLink]="link.route" class="quick-link" [style.--color]="link.color">
-            <span class="ql-icon" [innerHTML]="link.icon"></span>
+            <span class="ql-icon"><app-icon [name]="link.icon" [size]="22"></app-icon></span>
             <span class="ql-label">{{ link.label }}</span>
           </a>
         }

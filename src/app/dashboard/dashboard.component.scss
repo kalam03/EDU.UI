@@ -17,6 +17,9 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 24px;
+
+  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
 }
 
 .stat-card {
@@ -40,7 +43,16 @@
   &.orange { background: linear-gradient(135deg, #dd6b20, #c05621); }
 }
 
-.stat-icon { font-size: 36px; }
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .stat-value {
   font-size: 28px;
@@ -164,11 +176,11 @@
 }
 
 .ql-icon {
-  font-size: 28px;
   width: 48px;
   height: 48px;
   border-radius: 12px;
   background: color-mix(in srgb, var(--color) 15%, white);
+  color: var(--color);
   display: flex;
   align-items: center;
   justify-content: center;

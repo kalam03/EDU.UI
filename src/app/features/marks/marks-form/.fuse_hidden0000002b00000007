@@ -1,0 +1,116 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">{{ isEdit ? 'Edit Mark' : 'Enter Marks' }}</span>
+    <a routerLink="/marks" class="btn-outline-light">&#8592; Back</a>
+  </div>
+
+  @if (isEdit) {
+    @if (loading) {
+      <div class="panel-body"><div class="form-loading">Loading...</div></div>
+    } @else {
+      <div class="panel-body">
+        @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Written Mark</label>
+            <input type="number" class="form-control" [(ngModel)]="editMark.writtenMark" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Class Test Mark</label>
+            <input type="number" class="form-control" [(ngModel)]="editMark.classTestMark" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Homework Mark</label>
+            <input type="number" class="form-control" [(ngModel)]="editMark.homeworkMark" min="0" />
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <a routerLink="/marks" class="btn btn-secondary">Cancel</a>
+        <button class="btn btn-primary" (click)="onEditSubmit()" [disabled]="saving">
+          {{ saving ? 'Saving...' : 'Update Mark' }}
+        </button>
+      </div>
+    }
+  } @else {
+    <div class="panel-body">
+      <div class="filter-bar">
+        <div class="form-group">
+          <label>Class <span class="required">*</span></label>
+          <app-searchable-select
+            [options]="classOptions"
+            placeholder="Select Class"
+            (valueChange)="onClassSelect($event)">
+          </app-searchable-select>
+        </div>
+        <div class="form-group">
+          <label>Exam <span class="required">*</span></label>
+          <app-searchable-select
+            [options]="examOptions"
+            placeholder="Select Exam"
+            (valueChange)="onExamSelect($event)">
+          </app-searchable-select>
+        </div>
+        <div class="form-group">
+          <label>
+            Subject <span class="required">*</span>
+            @if (classLoading) { <span class="loading-hint">Loading...</span> }
+          </label>
+          <app-searchable-select
+            [options]="subjectOptions"
+            [disabled]="classLoading || !selectedClassId"
+            placeholder="{{ classLoading ? 'Loading subjects...' : 'Select Subject' }}"
+            (valueChange)="onSubjectSelect($event)">
+          </app-searchable-select>
+        </div>
+      </div>
+
+      @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+
+      @if (studentsLoaded && markRows.length === 0) {
+        <div class="alert alert-danger">No students found in this class.</div>
+      }
+
+      @if (studentsLoaded && markRows.length > 0) {
+        <div style="overflow-x:auto;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student Name</th>
+                <th>Written</th>
+                <th>Class Test</th>
+                <th>Homework</th>
+                <th>Total</th>
+                <th>Grade</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of markRows; track row.studentId; let i = $index) {
+                <tr>
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ row.studentName }}</td>
+                  <td><input type="number" class="form-control" style="width:80px" [(ngModel)]="row.writtenMark" min="0" /></td>
+                  <td><input type="number" class="form-control" style="width:80px" [(ngModel)]="row.classTestMark" min="0" /></td>
+                  <td><input type="number" class="form-control" style="width:80px" [(ngModel)]="row.homeworkMark" min="0" /></td>
+                  <td><strong>{{ row.writtenMark + row.classTestMark + row.homeworkMark }}</strong></td>
+                  <td>
+                    <span class="badge" [ngClass]="getGrade(row) !== 'F' ? 'badge-success' : 'badge-danger'">
+                      {{ getGrade(row) }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="form-actions">
+          <a routerLink="/marks" class="btn btn-secondary">Cancel</a>
+          <button class="btn btn-primary" (click)="onSubmit()" [disabled]="saving">
+            {{ saving ? 'Saving...' : 'Save Marks' }}
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
@@ -15,7 +16,7 @@ interface AttendanceRow { studentId: number; studentName: string; status: string
 @Component({
   selector: 'app-attendance-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, EditableDatepickerComponent, SearchableSelectComponent],
+  imports: [CommonModule, FormsModule, RouterLink, EditableDatepickerComponent, SearchableSelectComponent, IconComponent],
   templateUrl: './attendance-form.component.html',
   styleUrl: './attendance-form.component.scss'
 })

@@ -1,7 +1,7 @@
 <div class="panel">
   <div class="panel-header">
     <span class="panel-title">{{ isEdit ? 'Edit Student' : 'Add Student' }}</span>
-    <a routerLink="/students" class="btn-outline-light">&#8592; Back</a>
+    <a routerLink="/students" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back</a>
   </div>
   @if (loading) {
     <div class="panel-body"><div class="form-loading">Loading...</div></div>
@@ -20,10 +20,10 @@
               @if (studentImagePreview) {
                 <img [src]="studentImagePreview" class="preview-img" alt="Student" />
                 <button type="button" class="remove-img-btn"
-                  (click)="removeImage('student'); $event.stopPropagation()">&#215;</button>
+                  (click)="removeImage('student'); $event.stopPropagation()"><app-icon name="x" [size]="14"></app-icon></button>
               } @else {
                 <div class="upload-placeholder">
-                  <span style="font-size:36px; opacity:0.4;">&#128100;</span>
+                  <span style="opacity:0.4;"><app-icon name="user" [size]="36"></app-icon></span>
                   <span style="font-size:12px;">Click to upload</span>
                 </div>
               }
@@ -38,10 +38,10 @@
               @if (fatherImagePreview) {
                 <img [src]="fatherImagePreview" class="preview-img" alt="Father" />
                 <button type="button" class="remove-img-btn"
-                  (click)="removeImage('father'); $event.stopPropagation()">&#215;</button>
+                  (click)="removeImage('father'); $event.stopPropagation()"><app-icon name="x" [size]="14"></app-icon></button>
               } @else {
                 <div class="upload-placeholder">
-                  <span style="font-size:36px; opacity:0.4;">&#128100;</span>
+                  <span style="opacity:0.4;"><app-icon name="user" [size]="36"></app-icon></span>
                   <span style="font-size:12px;">Click to upload</span>
                 </div>
               }
@@ -56,10 +56,10 @@
               @if (motherImagePreview) {
                 <img [src]="motherImagePreview" class="preview-img" alt="Mother" />
                 <button type="button" class="remove-img-btn"
-                  (click)="removeImage('mother'); $event.stopPropagation()">&#215;</button>
+                  (click)="removeImage('mother'); $event.stopPropagation()"><app-icon name="x" [size]="14"></app-icon></button>
               } @else {
                 <div class="upload-placeholder">
-                  <span style="font-size:36px; opacity:0.4;">&#128100;</span>
+                  <span style="opacity:0.4;"><app-icon name="user" [size]="36"></app-icon></span>
                   <span style="font-size:12px;">Click to upload</span>
                 </div>
               }

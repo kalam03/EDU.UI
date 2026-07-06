@@ -1,8 +1,13 @@
 <div class="layout" [class.sidebar-collapsed]="sidebarCollapsed">
   <app-sidebar
     [collapsed]="sidebarCollapsed"
+    [mobileOpen]="mobileMenuOpen"
     (toggleCollapse)="toggleSidebar()"
+    (navigate)="closeMobileMenu()"
   />
+  @if (mobileMenuOpen) {
+    <div class="mobile-backdrop" (click)="closeMobileMenu()"></div>
+  }
   <div class="main-content">
     <app-header
       [sidebarCollapsed]="sidebarCollapsed"

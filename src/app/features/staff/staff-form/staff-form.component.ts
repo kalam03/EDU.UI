@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -9,7 +10,7 @@ import { CustomDatepickerComponent } from '../../../shared/components/custom-dat
 @Component({
   selector: 'app-staff-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, CustomDatepickerComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, CustomDatepickerComponent, IconComponent],
   templateUrl: './staff-form.component.html',
   styleUrl: './staff-form.component.scss'
 })

@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
@@ -24,7 +25,7 @@ interface MarkRow {
 @Component({
   selector: 'app-marks-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SearchableSelectComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SearchableSelectComponent, IconComponent],
   templateUrl: './marks-form.component.html',
   styleUrl: './marks-form.component.scss'
 })

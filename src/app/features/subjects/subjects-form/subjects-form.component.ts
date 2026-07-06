@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -8,7 +9,7 @@ import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-subjects-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, IconComponent],
   templateUrl: './subjects-form.component.html',
   styleUrl: './subjects-form.component.scss'
 })

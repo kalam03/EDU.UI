@@ -1,0 +1,197 @@
+import { Component, OnInit, inject } from '@angular/core';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { MarkService } from '../../../core/services/mark.service';
+import { ExamService } from '../../../core/services/exam.service';
+import { SubjectService } from '../../../core/services/subject.service';
+import { StudentService } from '../../../core/services/student.service';
+import { ClassService } from '../../../core/services/class.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { Exam, Subject, Student, EduClass, Mark } from '../../../core/models';
+import { SearchableSelectComponent, SelectOption } from '../../../common/searchable-select/searchable-select.component';
+
+interface MarkRow {
+  studentId: number;
+  studentName: string;
+  writtenMark: number;
+  classTestMark: number;
+  homeworkMark: number;
+  examTotalMark: number;
+}
+
+@Component({
+  selector: 'app-marks-form',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink, SearchableSelectComponent],
+  templateUrl: './marks-form.component.html',
+  styleUrl: './marks-form.component.scss'
+})
+export class MarksFormComponent implements OnInit {
+  private markService    = inject(MarkService);
+  private examService    = inject(ExamService);
+  private subjectService = inject(SubjectService);
+  private studentService = inject(StudentService);
+  private classService   = inject(ClassService);
+  private authService    = inject(AuthService);
+  private router         = inject(Router);
+  private route          = inject(ActivatedRoute);
+
+  id: number | null = null;
+
+  classes:  EduClass[] = [];
+  exams:    Exam[] = [];
+  subjects: Subject[] = [];
+  students: Student[] = [];
+
+  selectedClassId:   number | null = null;
+  selectedExamId:    number | null = null;
+  selectedSubjectId: number | null = null;
+
+  classOptions:   SelectOption[] = [];
+  examOptions:    SelectOption[] = [];
+  subjectOptions: SelectOption[] = [];
+
+  markRows: MarkRow[] = [];
+  studentsLoaded  = false;
+  classLoading    = false;   // true while subjects + students are loading after class select
+  loading  = false;
+  saving   = false;
+  error    = '';
+  editMark: Partial<Mark> = {};
+
+  get isEdit(): boolean { return this.id !== null; }
+
+  ngOnInit(): void {
+    this.classService.list().subscribe(c => {
+      this.classes = c;
+      this.classOptions = c.map(cl => ({ value: cl.classId, label: cl.className || '' }));
+    });
+    this.examService.list().subscribe(e => {
+      this.exams = e;
+      this.examOptions = e.map(ex => ({ value: ex.examId, label: ex.examName || '' }));
+    });
+
+    const p = this.route.snapshot.paramMap.get('id');
+    if (p) {
+      this.id = +p;
+      this.loading = true;
+      this.markService.fetch(this.id).subscribe({
+        next:  m => { this.editMark = m; this.loading = false; },
+        error: () => { this.loading = false; }
+      });
+    }
+  }
+
+  onClassSelect(val: number | string | null): void {
+    this.selectedClassId   = val as number | null;
+    this.selectedSubjectId = null;
+    this.subjects      = [];
+    this.subjectOptions = [];
+    this.students      = [];
+    this.markRows      = [];
+    this.studentsLoaded = false;
+    this.error         = '';
+
+    if (!this.selectedClassId) return;
+
+    // Load subjects AND students in parallel — only set both once both have arrived
+    this.classLoading = true;
+    forkJoin({
+      subjects: this.subjectService.list(),
+      students: this.studentService.getByClass(this.selectedClassId)
+    }).subscribe({
+      next: ({ subjects, students }) => {
+        this.subjects      = subjects;
+        this.subjectOptions = subjects.map(s => ({ value: s.subjectId, label: s.subjectName || '' }));
+        this.students      = students;
+        this.classLoading  = false;
+      },
+      error: () => { this.classLoading = false; this.error = 'Failed to load class data.'; }
+    });
+  }
+
+  onExamSelect(val: number | string | null): void {
+    this.selectedExamId = val as number | null;
+    this.error = '';
+  }
+
+  onSubjectSelect(val: number | string | null): void {
+    this.selectedSubjectId = val as number | null;
+    this.error = '';
+
+    if (!val) {
+      this.markRows = [];
+      this.studentsLoaded = false;
+      return;
+    }
+
+    if (this.students.length === 0) {
+      this.error = 'No students found in this class.';
+      this.markRows = [];
+      this.studentsLoaded = false;
+      return;
+    }
+
+    // Students are guaranteed loaded (forkJoin in onClassSelect completed first)
+    this.markRows = this.students.map(s => ({
+      studentId:     s.studentId,
+      studentName:   `${s.firstName} ${s.lastName ?? ''}`.trim(),
+      writtenMark:   0,
+      classTestMark: 0,
+      homeworkMark:  0,
+      examTotalMark: 100
+    }));
+    this.studentsLoaded = true;
+  }
+
+  getGrade(r: MarkRow): string {
+    const total = r.writtenMark + r.classTestMark + r.homeworkMark;
+    const pct = r.examTotalMark ? (total / r.examTotalMark) * 100 : 0;
+    if (pct >= 80) return 'A+';
+    if (pct >= 70) return 'A';
+    if (pct >= 60) return 'B';
+    if (pct >= 50) return 'C';
+    if (pct >= 40) return 'D';
+    return 'F';
+  }
+
+  onSubmit(): void {
+    this.error = '';
+    if (!this.selectedExamId)    { this.error = 'Please select an exam.';    return; }
+    if (!this.selectedSubjectId) { this.error = 'Please select a subject.';  return; }
+    if (!this.markRows.length)   { this.error = 'No student rows to save.';  return; }
+
+    this.saving = true;
+    const schoolEiin = this.authService.schoolEiin;
+    const records = this.markRows.map(r => ({
+      studentId:       r.studentId,
+      examId:          this.selectedExamId!,
+      subjectId:       this.selectedSubjectId!,
+      writtenMark:     r.writtenMark,
+      classTestMark:   r.classTestMark,
+      homeworkMark:    r.homeworkMark,
+      obtainTotalMark: r.writtenMark + r.classTestMark + r.homeworkMark,
+      examTotalMark:   r.examTotalMark,
+      grade:           this.getGrade(r),
+      isAbsent:        false,
+      schoolEiin
+    }));
+
+    this.markService.bulkCreate(records as any).subscribe({
+      next:  () => this.router.navigate(['/marks']),
+      error: err => { this.saving = false; this.error = err?.error?.message ?? 'Save failed.'; }
+    });
+  }
+
+  onEditSubmit(): void {
+    if (!this.id) return;
+    this.saving = true;
+    this.markService.update(this.id, this.editMark as any).subscribe({
+      next:  () => this.router.navigate(['/marks']),
+      error: err => { this.saving = false; this.error = err?.error?.message ?? 'Save failed.'; }
+    });
+  }
+}

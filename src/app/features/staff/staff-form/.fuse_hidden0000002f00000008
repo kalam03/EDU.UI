@@ -1,0 +1,56 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">{{ isEdit ? 'Edit Staff' : 'Add Staff' }}</span>
+    <a routerLink="/staff" class="btn-outline-light">&#8592; Back</a>
+  </div>
+  @if (loading) {
+    <div class="panel-body"><div class="form-loading">Loading...</div></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="panel-body">
+        @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+        <div class="grid-2">
+          <div class="form-group">
+            <label>User ID <span class="required">*</span></label>
+            <input type="number" class="form-control"
+              [class.is-invalid]="form.get('userId')!.invalid && form.get('userId')!.touched"
+              formControlName="userId" placeholder="Link to user account" />
+            @if (form.get('userId')!.invalid && form.get('userId')!.touched) {
+              <div class="invalid-feedback">User ID is required.</div>
+            }
+          </div>
+          <div class="form-group">
+            <label>Staff Role</label>
+            <input type="text" class="form-control" formControlName="staffRole" placeholder="e.g. Teacher, Admin" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Join Date</label>
+            <app-custom-datepicker formControlName="joinDate"></app-custom-datepicker>
+          </div>
+          <div class="form-group">
+            <label>Salary (BDT)</label>
+            <input type="number" class="form-control" formControlName="salary" min="0" placeholder="Monthly salary" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Bank Account</label>
+            <input type="text" class="form-control" formControlName="bankAccount" placeholder="Account number" />
+          </div>
+          <div class="form-group">
+            <label>School EIIN</label>
+            <input type="text" class="form-control" formControlName="schoolEiin" placeholder="School EIIN" />
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <a routerLink="/staff" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          {{ saving ? 'Saving...' : (isEdit ? 'Update Staff' : 'Add Staff') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

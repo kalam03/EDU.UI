@@ -1,7 +1,7 @@
 <header class="header">
   <div class="header-left">
     <button class="menu-btn" (click)="toggleSidebar.emit()">
-      <span></span><span></span><span></span>
+      <app-icon name="menu" [size]="20"></app-icon>
     </button>
     <div class="breadcrumb">School Management System</div>
   </div>
@@ -11,7 +11,7 @@
       <button class="user-btn" (click)="toggleUserMenu()">
         <div class="avatar">{{ username[0]?.toUpperCase() }}</div>
         <span class="username">{{ username }}</span>
-        <span class="chevron">&#8964;</span>
+        <span class="chevron"><app-icon name="chevron-down" [size]="12"></app-icon></span>
       </button>
 
       @if (showUserMenu) {
@@ -25,7 +25,7 @@
           </div>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item danger" (click)="logout()">
-            &#128275; Sign Out
+            <app-icon name="log-out" [size]="14"></app-icon> Sign Out
           </button>
         </div>
       }

@@ -1,13 +1,13 @@
-<aside class="sidebar" [class.collapsed]="collapsed">
+<aside class="sidebar" [class.collapsed]="collapsed" [class.mobile-open]="mobileOpen">
   <div class="sidebar-header">
     <div class="logo">
-      <span class="logo-icon">&#127979;</span>
+      <span class="logo-icon"><app-icon name="graduation-cap" [size]="24"></app-icon></span>
       @if (!collapsed) {
         <span class="logo-text">EDU</span>
       }
     </div>
     <button class="collapse-btn" (click)="toggleCollapse.emit()">
-      {{ collapsed ? '&#9654;' : '&#9664;' }}
+      <app-icon [name]="collapsed ? 'chevron-right' : 'chevron-left'" [size]="14"></app-icon>
     </button>
   </div>
 
@@ -18,8 +18,9 @@
         routerLinkActive="active"
         class="nav-item"
         [title]="collapsed ? item.label : ''"
+        (click)="navigate.emit()"
       >
-        <span class="nav-icon" [innerHTML]="item.icon"></span>
+        <span class="nav-icon"><app-icon [name]="item.icon" [size]="18"></app-icon></span>
         @if (!collapsed) {
           <span class="nav-label">{{ item.label }}</span>
         }

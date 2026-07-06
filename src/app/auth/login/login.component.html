@@ -1,7 +1,7 @@
 <div class="login-wrapper">
   <div class="login-card">
     <div class="login-logo">
-      <div class="logo-icon">&#127979;</div>
+      <div class="logo-icon"><app-icon name="graduation-cap" [size]="40" [strokeWidth]="1.6"></app-icon></div>
       <h1>EDU</h1>
       <p>School Management System</p>
     </div>
@@ -37,8 +37,8 @@
             placeholder="Enter your password"
             autocomplete="current-password"
           />
-          <button type="button" class="toggle-password" (click)="showPassword = !showPassword">
-            {{ showPassword ? '&#128065;' : '&#128064;' }}
+          <button type="button" class="toggle-password" (click)="showPassword = !showPassword" [title]="showPassword ? 'Hide password' : 'Show password'">
+            <app-icon [name]="showPassword ? 'eye-off' : 'eye'" [size]="18"></app-icon>
           </button>
         </div>
         @if (password.invalid && password.touched) {

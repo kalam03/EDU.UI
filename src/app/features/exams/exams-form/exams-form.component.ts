@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -8,7 +9,7 @@ import { ClassService } from '../../../core/services/class.service';
 import { SelectOption, SearchableSelectComponent } from '../../../common/searchable-select/searchable-select.component';
 import { CustomDatepickerComponent } from '../../../shared/components/custom-datepicker/custom-datepicker.component';
 
-@Component({ selector: 'app-exams-form', standalone: true, imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent, CustomDatepickerComponent], templateUrl: './exams-form.component.html', styleUrl: './exams-form.component.scss' })
+@Component({ selector: 'app-exams-form', standalone: true, imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent, CustomDatepickerComponent, IconComponent], templateUrl: './exams-form.component.html', styleUrl: './exams-form.component.scss' })
 export class ExamsFormComponent implements OnInit {
   private fb = inject(FormBuilder); private examService = inject(ExamService);
   private classService = inject(ClassService); private route = inject(ActivatedRoute); private router = inject(Router);

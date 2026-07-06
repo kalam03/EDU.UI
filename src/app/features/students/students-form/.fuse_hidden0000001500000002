@@ -1,0 +1,188 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">{{ isEdit ? 'Edit Student' : 'Add Student' }}</span>
+    <a routerLink="/students" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back</a>
+  </div>
+  @if (loading) {
+    <div class="panel-body"><div class="form-loading">Loading...</div></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="panel-body">
+        @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+
+        <!-- Photos -->
+        <div class="section-title">Photos</div>
+        <div class="grid-3">
+
+          <div class="image-upload-card">
+            <div class="image-upload-label">Student Photo</div>
+            <div class="image-preview-box" (click)="studentInput.click()">
+              @if (studentImagePreview) {
+                <img [src]="studentImagePreview" class="preview-img" alt="Student" />
+                <button type="button" class="remove-img-btn"
+                  (click)="removeImage('student'); $event.stopPropagation()">&#215;</button>
+              } @else {
+                <div class="upload-placeholder">
+                  <span style="font-size:36px; opacity:0.4;">&#128100;</span>
+                  <span style="font-size:12px;">Click to upload</span>
+                </div>
+              }
+            </div>
+            <input #studentInput type="file" accept="image/*" hidden
+              (change)="onFileSelect('student', $event)" />
+          </div>
+
+          <div class="image-upload-card">
+            <div class="image-upload-label">Father Photo</div>
+            <div class="image-preview-box" (click)="fatherInput.click()">
+              @if (fatherImagePreview) {
+                <img [src]="fatherImagePreview" class="preview-img" alt="Father" />
+                <button type="button" class="remove-img-btn"
+                  (click)="removeImage('father'); $event.stopPropagation()">&#215;</button>
+              } @else {
+                <div class="upload-placeholder">
+                  <span style="font-size:36px; opacity:0.4;">&#128100;</span>
+                  <span style="font-size:12px;">Click to upload</span>
+                </div>
+              }
+            </div>
+            <input #fatherInput type="file" accept="image/*" hidden
+              (change)="onFileSelect('father', $event)" />
+          </div>
+
+          <div class="image-upload-card">
+            <div class="image-upload-label">Mother Photo</div>
+            <div class="image-preview-box" (click)="motherInput.click()">
+              @if (motherImagePreview) {
+                <img [src]="motherImagePreview" class="preview-img" alt="Mother" />
+                <button type="button" class="remove-img-btn"
+                  (click)="removeImage('mother'); $event.stopPropagation()">&#215;</button>
+              } @else {
+                <div class="upload-placeholder">
+                  <span style="font-size:36px; opacity:0.4;">&#128100;</span>
+                  <span style="font-size:12px;">Click to upload</span>
+                </div>
+              }
+            </div>
+            <input #motherInput type="file" accept="image/*" hidden
+              (change)="onFileSelect('mother', $event)" />
+          </div>
+
+        </div>
+
+        <!-- Personal Information -->
+        <div class="section-title">Personal Information</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Admission No <span style="font-size:10px;color:var(--text-muted);font-weight:400;">(auto)</span></label>
+            <input type="text" class="form-control" formControlName="admissionNo"
+              style="background:#f7fafc;color:var(--text-muted);cursor:not-allowed;" readonly />
+          </div>
+          <div class="form-group">
+            <label>Enrollment Year</label>
+            <input type="text" class="form-control" formControlName="enrollmentYear" placeholder="e.g. 2024" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>First Name <span class="required">*</span></label>
+            <input type="text" class="form-control"
+              [class.is-invalid]="form.get('firstName')!.invalid && form.get('firstName')!.touched"
+              formControlName="firstName" placeholder="First name" />
+            @if (form.get('firstName')!.invalid && form.get('firstName')!.touched) {
+              <div class="invalid-feedback">Required.</div>
+            }
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" class="form-control" formControlName="lastName" placeholder="Last name" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Father Name</label>
+            <input type="text" class="form-control" formControlName="fatherName" placeholder="Father's name" />
+          </div>
+          <div class="form-group">
+            <label>Mother Name</label>
+            <input type="text" class="form-control" formControlName="motherName" placeholder="Mother's name" />
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Date of Birth</label>
+            <app-editable-datepicker formControlName="dob"></app-editable-datepicker>
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <app-searchable-select [options]="genderOptions" formControlName="gender" placeholder="Select Gender"></app-searchable-select>
+          </div>
+          <div class="form-group">
+            <label>Mobile</label>
+            <input type="tel" class="form-control" formControlName="mobileNumber" placeholder="+880..." />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control"
+              [class.is-invalid]="form.get('email')!.invalid && form.get('email')!.touched"
+              formControlName="email" placeholder="student@email.com" />
+            @if (form.get('email')!.invalid && form.get('email')!.touched) {
+              <div class="invalid-feedback">Enter a valid email.</div>
+            }
+          </div>
+          <div class="form-group">
+            <label>Tuition Fee</label>
+            <input type="number" class="form-control" formControlName="tuitionFee" min="0" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <textarea class="form-control" formControlName="address" rows="2" placeholder="Full address"></textarea>
+        </div>
+
+        <!-- Academic Information -->
+        <div class="section-title">Academic Information</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Class</label>
+            <app-searchable-select [options]="classOptions" formControlName="classId" placeholder="Select Class" (valueChange)="onClassChange($any($event))"></app-searchable-select>
+          </div>
+          <div class="form-group">
+            <label>Section</label>
+            <app-searchable-select [options]="sectionOptions" formControlName="sectionId" placeholder="Select Section"></app-searchable-select>
+          </div>
+          <div class="form-group">
+            <label>Group</label>
+            <app-searchable-select [options]="groupOptions" formControlName="groupId" placeholder="No Group"></app-searchable-select>
+          </div>
+        </div>
+
+        <!-- Guardian Information -->
+        <div class="section-title">Guardian Information</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Guardian Name</label>
+            <input type="text" class="form-control" formControlName="guardianName" placeholder="Guardian name" />
+          </div>
+          <div class="form-group">
+            <label>Guardian Contact</label>
+            <input type="tel" class="form-control" formControlName="guardianContact" placeholder="+880..." />
+          </div>
+          <div class="form-group">
+            <label>Relation</label>
+            <input type="text" class="form-control" formControlName="guardianRelation" placeholder="e.g. Father" />
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <a routerLink="/students" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          {{ saving ? 'Saving...' : (isEdit ? 'Update Student' : 'Add Student') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

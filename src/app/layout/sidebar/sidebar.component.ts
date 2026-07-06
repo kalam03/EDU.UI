@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 
 interface NavItem {
   label: string;
@@ -12,27 +13,29 @@ interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, IconComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
   @Input() collapsed = false;
+  @Input() mobileOpen = false;
   @Output() toggleCollapse = new EventEmitter<void>();
+  @Output() navigate = new EventEmitter<void>();
 
   navItems: NavItem[] = [
-    { label: 'Dashboard', icon: '&#128200;', route: '/dashboard' },
-    { label: 'Students', icon: '&#127891;', route: '/students' },
-    { label: 'Staff', icon: '&#128104;&#8205;&#127979;', route: '/staff' },
-    { label: 'Classes', icon: '&#127970;', route: '/classes' },
-    { label: 'Sections', icon: '&#128203;', route: '/sections' },
-    { label: 'Groups', icon: '&#128101;', route: '/groups' },
-    { label: 'Subjects', icon: '&#128218;', route: '/subjects' },
-    { label: 'Attendance', icon: '&#9989;', route: '/attendance' },
-    { label: 'Exams', icon: '&#128221;', route: '/exams' },
-    { label: 'Marks', icon: '&#127942;', route: '/marks' },
-    { label: 'Fees', icon: '&#128176;', route: '/fees' },
-    { label: 'Marksheet', icon: '&#128196;', route: '/marksheet' },
-    { label: 'School Info', icon: '&#127968;', route: '/school-info' }
+    { label: 'Dashboard', icon: 'bar-chart-2', route: '/dashboard' },
+    { label: 'Students', icon: 'graduation-cap', route: '/students' },
+    { label: 'Staff', icon: 'user-check', route: '/staff' },
+    { label: 'Classes', icon: 'building', route: '/classes' },
+    { label: 'Sections', icon: 'clipboard', route: '/sections' },
+    { label: 'Groups', icon: 'users', route: '/groups' },
+    { label: 'Subjects', icon: 'book-open', route: '/subjects' },
+    { label: 'Attendance', icon: 'check-square', route: '/attendance' },
+    { label: 'Exams', icon: 'file-text', route: '/exams' },
+    { label: 'Marks', icon: 'award', route: '/marks' },
+    { label: 'Fees', icon: 'dollar-sign', route: '/fees' },
+    { label: 'Marksheet', icon: 'file', route: '/marksheet' },
+    { label: 'School Info', icon: 'home', route: '/school-info' }
   ];
 }
