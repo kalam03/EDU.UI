@@ -1,0 +1,90 @@
+<div class="panel">
+  <div class="panel-header no-print">
+    <span class="panel-title">Fee Payment Slip</span>
+    <div class="d-flex gap-2">
+      @if (slip) {
+        <button class="btn-outline-light" (click)="print()"><app-icon name="printer" [size]="14"></app-icon> Print</button>
+      }
+      <a routerLink="/fees" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back to Fees</a>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    @if (loading) {
+      <div class="form-loading">Loading...</div>
+    } @else if (error) {
+      <div class="alert alert-danger">{{ error }}</div>
+    } @else if (slip) {
+      <div class="slip">
+        <div class="slip-header">
+          <div class="slip-title">Fee Payment Receipt</div>
+          <div class="slip-meta">
+            <span>Receipt No: <strong>#{{ slip.paymentId }}</strong></span>
+            <span>Date: <strong>{{ slip.paymentDate | date:'dd MMM yyyy' }}</strong></span>
+            <span>School EIIN: <strong>{{ slip.schoolEiin ?? '—' }}</strong></span>
+          </div>
+        </div>
+
+        <div class="slip-section">
+          <div class="slip-section-title">Student Information</div>
+          <div class="slip-grid">
+            <div><span class="slip-label">Name</span><span class="slip-value">{{ slip.firstName }} {{ slip.lastName ?? '' }}</span></div>
+            <div><span class="slip-label">Admission No</span><span class="slip-value">{{ slip.admissionNo }}</span></div>
+            <div><span class="slip-label">Class</span><span class="slip-value">{{ slip.className ?? '—' }}</span></div>
+            <div><span class="slip-label">Section</span><span class="slip-value">{{ slip.sectionName ?? '—' }}</span></div>
+            <div><span class="slip-label">Guardian</span><span class="slip-value">{{ slip.guardianName ?? '—' }}</span></div>
+            <div><span class="slip-label">Guardian Contact</span><span class="slip-value">{{ slip.guardianContact ?? '—' }}</span></div>
+          </div>
+        </div>
+
+        <div class="slip-section">
+          <div class="slip-section-title">Fee Details</div>
+          <div class="slip-grid">
+            <div><span class="slip-label">Fee Type</span><span class="slip-value">{{ slip.feeType }}</span></div>
+            <div><span class="slip-label">Applicable Year</span><span class="slip-value">{{ slip.applicableYear ?? '—' }}</span></div>
+            <div><span class="slip-label">Total Fee Amount</span><span class="slip-value">৳{{ slip.feeAmount | number:'1.2-2' }}</span></div>
+            <div><span class="slip-label">Status</span>
+              <span class="badge" [ngClass]="slip.status === 'Paid' ? 'badge-success' : (slip.status === 'Partial' ? 'badge-warning' : 'badge-danger')">{{ slip.status }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="slip-section">
+          <div class="slip-section-title">This Payment</div>
+          <table class="table slip-table">
+            <tbody>
+              <tr><td>Amount Paid</td><td class="amt">৳{{ slip.amountPaid | number:'1.2-2' }}</td></tr>
+              <tr><td>Discount</td><td class="amt">৳{{ slip.discountAmount | number:'1.2-2' }}</td></tr>
+              <tr><td>Fine</td><td class="amt">৳{{ slip.fineAmount | number:'1.2-2' }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="slip-section">
+          <div class="slip-section-title">Account Summary (All Payments For This Fee)</div>
+          <table class="table slip-table">
+            <tbody>
+              <tr><td>Total Fee Assigned</td><td class="amt">৳{{ slip.feeAmount | number:'1.2-2' }}</td></tr>
+              <tr><td>Total Paid To Date</td><td class="amt">৳{{ slip.totalPaid | number:'1.2-2' }}</td></tr>
+              <tr><td>Total Discount</td><td class="amt">৳{{ slip.totalDiscount | number:'1.2-2' }}</td></tr>
+              <tr><td>Total Fine</td><td class="amt">৳{{ slip.totalFine | number:'1.2-2' }}</td></tr>
+              <tr class="slip-total-row">
+                <td>Balance Due</td>
+                <td class="amt">
+                  <span class="badge" [ngClass]="slip.totalDue > 0 ? 'badge-danger' : 'badge-success'">
+                    ৳{{ slip.totalDue | number:'1.2-2' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="slip-signatures">
+          <div class="slip-sign"><div class="slip-sign-line"></div>Received By</div>
+          <div class="slip-sign"><div class="slip-sign-line"></div>Authorized Signature</div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseApiService } from './api.service';
-import { FeesMaster, FeePayment, StudentFeeDue, StudentFeeDueDetail, ApiResponse } from '../models';
+import { FeesMaster, FeePayment, StudentFeeDue, StudentFeeDueDetail, FeePaymentSlip, ApiResponse } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class FeesMasterService extends BaseApiService<FeesMaster> {
@@ -32,6 +32,13 @@ export class FeePaymentService extends BaseApiService<FeePayment> {
   getFeeDueDetail(studentId: number): Observable<StudentFeeDueDetail[]> {
     return this.http.get<ApiResponse<StudentFeeDueDetail[]>>(`${this.url}/dues/${studentId}`).pipe(
       map(r => r.data ?? [])
+    );
+  }
+
+  /** Printable receipt/slip data for a single payment. */
+  getSlip(paymentId: number): Observable<FeePaymentSlip> {
+    return this.http.get<ApiResponse<FeePaymentSlip>>(`${this.url}/${paymentId}/slip`).pipe(
+      map(r => r.data)
     );
   }
 }

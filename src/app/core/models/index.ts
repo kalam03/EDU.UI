@@ -243,6 +243,36 @@ export interface StudentFeeDueDetail {
   due: number;
 }
 
+// ── Fee Payment Slip / Receipt ──────────────────────────────────────────────
+export interface FeePaymentSlip {
+  paymentId: number;
+  amountPaid: number;
+  discountAmount: number;
+  fineAmount: number;
+  paymentDate: string;
+  status: string;
+
+  studentId: number;
+  admissionNo: string;
+  firstName: string;
+  lastName?: string;
+  guardianName?: string;
+  guardianContact?: string;
+  className?: string;
+  sectionName?: string;
+
+  feeMasterId: number;
+  feeType: string;
+  applicableYear?: string;
+  feeAmount: number;
+
+  totalPaid: number;
+  totalDiscount: number;
+  totalFine: number;
+  totalDue: number;
+  schoolEiin?: string;
+}
+
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export interface DashboardStats {
   totalStudents: number;

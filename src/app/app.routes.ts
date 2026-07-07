@@ -135,6 +135,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/fees/fees-form/fees-form.component').then(m => m.FeesFormComponent)
       },
       {
+        path: 'fees/:id/slip',
+        loadComponent: () => import('./features/fees/fee-slip/fee-slip.component').then(m => m.FeeSlipComponent)
+      },
+      {
         path: 'fees/dues',
         loadComponent: () => import('./features/fees/fee-dues/fee-dues.component').then(m => m.FeeDuesComponent)
       },

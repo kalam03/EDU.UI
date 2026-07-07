@@ -24,7 +24,9 @@
       [data]="$any(filtered)"
       [loading]="loading"
       [showSearch]="true"
+      [showView]="true"
       searchPlaceholder="Search fees..."
+      (view)="onView($event)"
       (edit)="onEdit($event)"
       (delete)="onDelete($event)"
     />

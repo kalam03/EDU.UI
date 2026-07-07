@@ -25,6 +25,12 @@ export class DataTableComponent implements OnChanges {
   @Input() pageSize = 15;
   @Input() showSearch = true;
   @Input() searchPlaceholder = 'Search...';
+  // Some grids (e.g. Fee Payments) need a read-only "View" action alongside edit/delete, or
+  // instead of them — showEdit/showDelete let a table hide either default action.
+  @Input() showView = false;
+  @Input() showEdit = true;
+  @Input() showDelete = true;
+  @Output() view = new EventEmitter<Record<string, unknown>>();
   @Output() edit = new EventEmitter<Record<string, unknown>>();
   @Output() delete = new EventEmitter<Record<string, unknown>>();
 

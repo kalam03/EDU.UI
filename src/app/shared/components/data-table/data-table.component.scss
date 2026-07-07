@@ -140,7 +140,7 @@
 .badge-info    { background: #bee3f8; color: #2a4365; }
 
 /* ── Actions ── */
-.dt-actions-col { width: 80px; }
+.dt-actions-col { width: 116px; }
 
 .dt-actions-cell {
   display: flex;
@@ -159,6 +159,13 @@
   justify-content: center;
   transition: all 0.15s;
   flex-shrink: 0;
+}
+
+.dt-btn-view {
+  border-color: #319795;
+  background: #e6fffa;
+  color: #319795;
+  &:hover { background: #319795; color: #fff; }
 }
 
 .dt-btn-edit {
