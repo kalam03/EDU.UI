@@ -119,6 +119,7 @@ export class DataTableComponent implements OnChanges {
     if (val === 'true' || val === 'Active' || val === 'Present' || val === 'Paid') return 'badge-success';
     if (val === 'false' || val === 'Inactive' || val === 'Absent' || val === 'Unpaid') return 'badge-danger';
     if (val === 'Late' || val === 'Partial' || val === 'Excused') return 'badge-warning';
+    // Advance (a prepayment beyond the due) falls through to the default badge-info below.
     return 'badge-info';
   }
 }

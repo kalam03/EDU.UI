@@ -32,9 +32,9 @@
         </div>
         @if (currentDueLoading) {
           <div class="alert" style="background:#f1f5f9;color:var(--text-muted);">Checking current due...</div>
-        } @else if (currentDue !== null) {
-          <div class="alert" [style.background]="currentDue > 0 ? '#fff4e5' : '#e6f7ee'" [style.color]="currentDue > 0 ? '#8a5a00' : '#0a7a3f'">
-            Current outstanding due for this fee type: <strong>৳{{ currentDue | number:'1.2-2' }}</strong>
+        } @else if (effectiveDue !== null) {
+          <div class="alert" [style.background]="effectiveDue > 0 ? '#fff4e5' : '#e6f7ee'" [style.color]="effectiveDue > 0 ? '#8a5a00' : '#0a7a3f'">
+            Due for this fee type{{ isEdit ? ' (before this payment)' : '' }}: <strong>৳{{ effectiveDue | number:'1.2-2' }}</strong>
           </div>
         }
         <div class="grid-3">
@@ -62,8 +62,12 @@
           <div class="form-group">
             <label>Status <span class="required">*</span></label>
             <app-searchable-select [options]="statusOptions" formControlName="status" placeholder="Select Status"></app-searchable-select>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Paid = clears the due exactly. Partial = less than the due. Advance = more than the due.</div>
           </div>
         </div>
+        @if (form.errors?.['statusMismatch'] && (submitted || form.get('amountPaid')!.dirty || form.get('status')!.dirty)) {
+          <div class="invalid-feedback" style="margin-top:-8px;margin-bottom:16px;">{{ form.errors!['statusMismatch'] }}</div>
+        }
         <div class="form-group">
           <label>School EIIN</label>
           <input type="text" class="form-control" formControlName="schoolEiin" placeholder="School EIIN" />

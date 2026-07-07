@@ -44,7 +44,7 @@
             <div><span class="slip-label">Applicable Year</span><span class="slip-value">{{ slip.applicableYear ?? '—' }}</span></div>
             <div><span class="slip-label">Total Fee Amount</span><span class="slip-value">৳{{ slip.feeAmount | number:'1.2-2' }}</span></div>
             <div><span class="slip-label">Status</span>
-              <span class="badge" [ngClass]="slip.status === 'Paid' ? 'badge-success' : (slip.status === 'Partial' ? 'badge-warning' : 'badge-danger')">{{ slip.status }}</span>
+              <span class="badge" [ngClass]="slip.status === 'Paid' ? 'badge-success' : (slip.status === 'Partial' ? 'badge-warning' : 'badge-info')">{{ slip.status }}</span>
             </div>
           </div>
         </div>

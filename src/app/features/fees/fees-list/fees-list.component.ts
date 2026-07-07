@@ -32,8 +32,8 @@ export class FeesListComponent implements OnInit {
   statusOptions: SelectOption[] = [
     { value: '', label: 'All Status' },
     { value: 'Paid',    label: 'Paid' },
-    { value: 'Unpaid',  label: 'Unpaid' },
-    { value: 'Partial', label: 'Partial' }
+    { value: 'Partial', label: 'Partial' },
+    { value: 'Advance', label: 'Advance' }
   ];
 
   columns: TableColumn[] = [
