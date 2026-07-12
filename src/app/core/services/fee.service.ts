@@ -1,8 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseApiService } from './api.service';
-import { FeesMaster, FeePayment, StudentFeeDue, StudentFeeDueDetail, FeePaymentSlip, ApiResponse } from '../models';
+import { FeesMaster, FeePayment, StudentFeeDue, StudentFeeDueDetail, FeePaymentSlip, FeeAdjustment, CreateFeeAdjustment, ApiResponse } from '../models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class FeesMasterService extends BaseApiService<FeesMaster> {
@@ -46,3 +48,21 @@ export class FeePaymentService extends BaseApiService<FeePayment> {
 /** Alias for backward compat with components that use FeeService */
 @Injectable({ providedIn: 'root' })
 export class FeeService extends FeePaymentService {}
+
+@Injectable({ providedIn: 'root' })
+export class FeeAdjustmentService {
+  private http = inject(HttpClient);
+  private get url(): string { return `${environment.apiUrl}/feeadjustments`; }
+
+  /** Moves advance credit from one fee type to another for a student. No new cash changes hands. */
+  create(data: CreateFeeAdjustment): Observable<ApiResponse<number>> {
+    return this.http.post<ApiResponse<number>>(this.url, data);
+  }
+
+  /** Adjustment history for one student. */
+  getHistory(studentId: number): Observable<FeeAdjustment[]> {
+    return this.http.get<ApiResponse<FeeAdjustment[]>>(`${this.url}/student/${studentId}`).pipe(
+      map(r => r.data ?? [])
+    );
+  }
+}

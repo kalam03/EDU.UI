@@ -88,16 +88,62 @@
                               <td style="text-align:right;">৳{{ d.discount | number:'1.2-2' }}</td>
                               <td style="text-align:right;">৳{{ d.fine | number:'1.2-2' }}</td>
                               <td style="text-align:right;">৳{{ d.paid | number:'1.2-2' }}</td>
-                              <td style="text-align:right;">৳{{ d.due | number:'1.2-2' }}</td>
-                              <td style="text-align:center;">
+                              <td style="text-align:right;">
+                                @if (d.due < 0) {
+                                  <span class="badge badge-success">৳{{ -d.due | number:'1.2-2' }} credit</span>
+                                } @else {
+                                  ৳{{ d.due | number:'1.2-2' }}
+                                }
+                              </td>
+                              <td style="text-align:center;white-space:nowrap;">
                                 @if (d.due > 0) {
                                   <a class="btn-outline-light" style="padding:2px 10px;font-size:12px;"
                                      [routerLink]="['/fees/new']"
                                      [queryParams]="{ studentId: row.studentId, feeMasterId: d.feeMasterId }"
                                      (click)="$event.stopPropagation()">Pay</a>
+                                } @else if (d.due < 0) {
+                                  <button type="button" class="btn-outline-light" style="padding:2px 10px;font-size:12px;"
+                                          (click)="$event.stopPropagation(); openAdjustForm(d.feeMasterId)">Adjust</button>
                                 }
                               </td>
                             </tr>
+                            @if (adjustFromFeeMasterId === d.feeMasterId) {
+                              <tr class="adjust-row" (click)="$event.stopPropagation()">
+                                <td colspan="8">
+                                  <div class="adjust-form">
+                                    <div class="adjust-title">
+                                      Move ৳{{ adjustAvailableCredit | number:'1.2-2' }} advance credit from
+                                      <strong>{{ d.feeType }}</strong> to another fee type
+                                    </div>
+                                    @if (adjustError) { <div class="alert alert-danger" style="margin:8px 0;">{{ adjustError }}</div> }
+                                    <div class="adjust-fields">
+                                      <div class="form-group">
+                                        <label>Apply to</label>
+                                        <app-searchable-select
+                                          [options]="adjustDestinationOptions"
+                                          placeholder="Select fee type"
+                                          (valueChange)="onAdjustDestinationSelect($any($event))">
+                                        </app-searchable-select>
+                                      </div>
+                                      <div class="form-group">
+                                        <label>Amount (BDT)</label>
+                                        <input type="number" class="form-control" [(ngModel)]="adjustAmount" min="0" step="0.01" />
+                                      </div>
+                                      <div class="form-group" style="flex:1.4;">
+                                        <label>Remarks (optional)</label>
+                                        <input type="text" class="form-control" [(ngModel)]="adjustRemarks" placeholder="e.g. Moved to cover tuition due" />
+                                      </div>
+                                    </div>
+                                    <div class="adjust-actions">
+                                      <button type="button" class="btn btn-secondary" (click)="closeAdjustForm()">Cancel</button>
+                                      <button type="button" class="btn btn-primary" [disabled]="adjustSaving" (click)="confirmAdjust(row)">
+                                        {{ adjustSaving ? 'Applying...' : 'Confirm Adjustment' }}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            }
                           }
                         </tbody>
                       </table>

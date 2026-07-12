@@ -273,6 +273,30 @@ export interface FeePaymentSlip {
   schoolEiin?: string;
 }
 
+// ── Fee Advance Adjustment ───────────────────────────────────────────────────
+export interface FeeAdjustment {
+  adjustmentId: number;
+  studentId: number;
+  fromFeeMasterId: number;
+  fromFeeType: string;
+  toFeeMasterId: number;
+  toFeeType: string;
+  amount: number;
+  adjustmentDate: string;
+  remarks?: string;
+  makeBy?: string;
+  makeDate?: string;
+}
+
+export interface CreateFeeAdjustment {
+  studentId: number;
+  fromFeeMasterId: number;
+  toFeeMasterId: number;
+  amount: number;
+  adjustmentDate?: string;
+  remarks?: string;
+}
+
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export interface DashboardStats {
   totalStudents: number;
