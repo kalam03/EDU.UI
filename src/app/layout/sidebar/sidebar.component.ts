@@ -37,6 +37,7 @@ export class SidebarComponent {
     { label: 'Fees', icon: 'dollar-sign', route: '/fees' },
     { label: 'Fee Types', icon: 'clipboard', route: '/fee-types' },
     { label: 'Fee Dues', icon: 'trending-up', route: '/fees/dues' },
+    { label: 'Library', icon: 'book', route: '/library/books' },
     { label: 'Marksheet', icon: 'file', route: '/marksheet' },
     { label: 'School Info', icon: 'home', route: '/school-info' }
   ];

@@ -1,0 +1,48 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">{{ isEdit ? 'Edit Book' : 'Add Book' }}</span>
+    <a routerLink="/library/books" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back</a>
+  </div>
+  @if (loading) {
+    <div class="panel-body"><div class="form-loading">Loading...</div></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="panel-body">
+        @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+        <div class="form-group">
+          <label>Title <span class="required">*</span></label>
+          <input type="text" class="form-control"
+            [class.is-invalid]="form.get('title')!.invalid && form.get('title')!.touched"
+            formControlName="title" placeholder="e.g. A Brief History of Time" />
+          @if (form.get('title')!.invalid && form.get('title')!.touched) {
+            <div class="invalid-feedback">Title is required.</div>
+          }
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Author</label>
+            <input type="text" class="form-control" formControlName="author" placeholder="e.g. Stephen Hawking" />
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <input type="text" class="form-control" formControlName="category" placeholder="e.g. Science, Fiction" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>ISBN</label>
+          <input type="text" class="form-control" formControlName="isbn" placeholder="e.g. 978-0553380163" />
+        </div>
+        <div class="form-group">
+          <label>School EIIN</label>
+          <input type="text" class="form-control" formControlName="schoolEiin" placeholder="School EIIN" />
+        </div>
+      </div>
+      <div class="panel-footer">
+        <a routerLink="/library/books" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          {{ saving ? 'Saving...' : (isEdit ? 'Update Book' : 'Add Book') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

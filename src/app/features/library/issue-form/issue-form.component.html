@@ -1,0 +1,41 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Issue Book</span>
+    <a routerLink="/library/issues" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back</a>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="panel-body">
+      @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+
+      <div class="form-group">
+        <label>Book Copy <span class="required">*</span></label>
+        <app-searchable-select [options]="copyOptions" formControlName="copyId" placeholder="Select an available copy"></app-searchable-select>
+        @if (copyOptions.length === 0) {
+          <div class="form-hint">No copies are currently available. Add copies from the book's detail page.</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Student <span class="required">*</span></label>
+        <app-searchable-select [options]="studentOptions" formControlName="studentId" placeholder="Select a student"></app-searchable-select>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Issue Date <span class="required">*</span></label>
+          <input type="date" class="form-control" formControlName="issueDate" />
+        </div>
+        <div class="form-group">
+          <label>Due Date <span class="required">*</span></label>
+          <input type="date" class="form-control" formControlName="dueDate" />
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <a routerLink="/library/issues" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary" [disabled]="saving">
+        {{ saving ? 'Issuing...' : 'Issue Book' }}
+      </button>
+    </div>
+  </form>
+</div>

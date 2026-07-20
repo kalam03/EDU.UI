@@ -297,6 +297,104 @@ export interface CreateFeeAdjustment {
   remarks?: string;
 }
 
+// ── Library: Book ─────────────────────────────────────────────────────────────
+export interface LibraryBook {
+  bookId: number;
+  title: string;
+  author?: string;
+  isbn?: string;
+  category?: string;
+  schoolEiin?: string;
+}
+
+/** Catalog row with copy-count availability. */
+export interface LibraryBookCatalog {
+  bookId: number;
+  title: string;
+  author?: string;
+  isbn?: string;
+  category?: string;
+  totalCopies: number;
+  availableCopies: number;
+}
+
+// ── Library: Book Copy ────────────────────────────────────────────────────────
+export interface LibraryBookCopy {
+  copyId: number;
+  bookId: number;
+  barcode: string;
+  status: string;
+  schoolEiin?: string;
+}
+
+/** An available copy, joined with its book title, for the Issue Book picker. */
+export interface AvailableLibraryBookCopy {
+  copyId: number;
+  bookId: number;
+  bookTitle: string;
+  barcode: string;
+  status: string;
+}
+
+// ── Library: Issue / Return ───────────────────────────────────────────────────
+export interface LibraryBookIssue {
+  issueId: number;
+  copyId: number;
+  barcode: string;
+  bookId: number;
+  bookTitle: string;
+  studentId: number;
+  admissionNo: string;
+  firstName: string;
+  lastName?: string;
+  issueDate: string;
+  dueDate: string;
+  returnDate?: string;
+  fineAmount: number;
+  finePaid: boolean;
+  finePaidDate?: string;
+  status: string;
+  isOverdue: boolean;
+}
+
+export interface OverdueLibraryBookIssue {
+  issueId: number;
+  copyId: number;
+  barcode: string;
+  bookId: number;
+  bookTitle: string;
+  studentId: number;
+  admissionNo: string;
+  firstName: string;
+  lastName?: string;
+  issueDate: string;
+  dueDate: string;
+  fineAmount: number;
+  finePaid: boolean;
+  status: string;
+  daysOverdue: number;
+}
+
+export interface IssueLibraryBookRequest {
+  copyId: number;
+  studentId: number;
+  issueDate?: string;
+  dueDate?: string;
+}
+
+export interface ReturnLibraryBookRequest {
+  returnDate?: string;
+  finePerDay?: number;
+  markLost?: boolean;
+}
+
+export interface ReturnLibraryBookResult {
+  issueId: number;
+  status: string;
+  returnDate?: string;
+  fineAmount: number;
+}
+
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export interface DashboardStats {
   totalStudents: number;

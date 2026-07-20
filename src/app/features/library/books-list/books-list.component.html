@@ -1,0 +1,21 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Library — Books</span>
+    <div style="display:flex;gap:8px;">
+      <a routerLink="/library/issues" class="btn-outline-light">Issues &amp; Returns</a>
+      <a routerLink="/library/books/new" class="btn-outline-light">+ Add Book</a>
+    </div>
+  </div>
+  <div class="panel-body">
+    <app-data-table
+      [columns]="columns"
+      [data]="$any(books)"
+      [loading]="loading"
+      [showView]="true"
+      searchPlaceholder="Search books..."
+      (view)="onView($event)"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+    />
+  </div>
+</div>

@@ -135,7 +135,7 @@ export class FeesFormComponent implements OnInit {
           this.form.patchValue(f as any);
           this.originalPayment = {
             studentId: f.studentId, feeMasterId: f.feeMasterId,
-            amountPaid: f.amountPaid, discountAmount: f.discountAmount, fineAmount: f.fineAmount
+            amountPaid: f.amountPaid ?? 0, discountAmount: f.discountAmount ?? 0, fineAmount: f.fineAmount ?? 0
           };
           this.loading = false;
           this.refreshCurrentDue();

@@ -155,6 +155,30 @@ export const routes: Routes = [
         loadComponent: () => import('./features/fees/fees-master-form/fees-master-form.component').then(m => m.FeesMasterFormComponent)
       },
       {
+        path: 'library/books',
+        loadComponent: () => import('./features/library/books-list/books-list.component').then(m => m.BooksListComponent)
+      },
+      {
+        path: 'library/books/new',
+        loadComponent: () => import('./features/library/books-form/books-form.component').then(m => m.BooksFormComponent)
+      },
+      {
+        path: 'library/books/:id/edit',
+        loadComponent: () => import('./features/library/books-form/books-form.component').then(m => m.BooksFormComponent)
+      },
+      {
+        path: 'library/books/:bookId/copies',
+        loadComponent: () => import('./features/library/book-copies/book-copies.component').then(m => m.BookCopiesComponent)
+      },
+      {
+        path: 'library/issues',
+        loadComponent: () => import('./features/library/issues-list/issues-list.component').then(m => m.IssuesListComponent)
+      },
+      {
+        path: 'library/issues/new',
+        loadComponent: () => import('./features/library/issue-form/issue-form.component').then(m => m.IssueFormComponent)
+      },
+      {
         path: 'school-info',
         loadComponent: () => import('./features/school-info/school-info.component').then(m => m.SchoolInfoComponent)
       },

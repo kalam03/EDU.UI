@@ -1,0 +1,55 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Copies — {{ book?.title ?? 'Book' }}</span>
+    <a routerLink="/library/books" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back to Books</a>
+  </div>
+  <div class="panel-body">
+    @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+
+    <div class="filter-bar">
+      <div class="form-group" style="flex:1;">
+        <label>Add Copy (Barcode)</label>
+        <input type="text" class="form-control" [(ngModel)]="newBarcode" placeholder="Scan or type barcode" (keydown.enter)="addCopy()" />
+      </div>
+      <button type="button" class="btn btn-primary" style="align-self:flex-end;" [disabled]="adding || !newBarcode.trim()" (click)="addCopy()">
+        <app-icon name="plus" [size]="14"></app-icon> {{ adding ? 'Adding...' : 'Add Copy' }}
+      </button>
+    </div>
+    @if (addError) { <div class="alert alert-danger">{{ addError }}</div> }
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Barcode</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading) {
+          <tr><td colspan="3" class="text-center" style="padding:32px;color:var(--text-muted);">Loading...</td></tr>
+        } @else if (copies.length === 0) {
+          <tr><td colspan="3" class="text-center" style="padding:32px;color:var(--text-muted);">No copies added yet.</td></tr>
+        } @else {
+          @for (copy of copies; track copy.copyId) {
+            <tr>
+              <td>{{ copy.barcode }}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'badge-success': copy.status === 'Available',
+                  'badge-warning': copy.status === 'Issued',
+                  'badge-danger': copy.status === 'Lost' || copy.status === 'Damaged'
+                }">{{ copy.status }}</span>
+              </td>
+              <td style="text-align:right;">
+                <button type="button" class="btn-outline-light" style="padding:2px 10px;font-size:12px;" (click)="deleteCopy(copy)">
+                  <app-icon name="trash" [size]="12"></app-icon> Delete
+                </button>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
