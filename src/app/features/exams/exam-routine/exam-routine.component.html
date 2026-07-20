@@ -1,0 +1,120 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Exam Routine</span>
+    <div style="display:flex;gap:8px;">
+      <a routerLink="/exams" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back to Exams</a>
+      @if (selectedExamId) {
+        <button type="button" class="btn-outline-light" [disabled]="printing" (click)="printRoutine()">
+          <app-icon name="printer" [size]="14"></app-icon> {{ printing ? 'Preparing...' : 'Print PDF' }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="panel-body">
+    @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+
+    <div class="form-group" style="max-width:360px;">
+      <label>Exam <span class="required">*</span></label>
+      <app-searchable-select
+        [options]="examOptions"
+        [disabled]="loadingOptions"
+        placeholder="Select an exam, e.g. Annual Exam"
+        (valueChange)="onExamSelect($event)">
+      </app-searchable-select>
+    </div>
+
+    @if (!selectedExamId) {
+      <div class="text-center" style="padding:32px;color:var(--text-muted);">
+        Select an exam above to build or view its routine.
+      </div>
+    } @else {
+      <div class="adjust-form" style="margin:16px 0;">
+        <div class="adjust-title">Add a routine slot</div>
+        <form [formGroup]="form" (ngSubmit)="addSlot()">
+          <div class="adjust-fields">
+            <div class="form-group">
+              <label>Class <span class="required">*</span></label>
+              <app-searchable-select [options]="classOptions" formControlName="classId" placeholder="Select Class"></app-searchable-select>
+            </div>
+            <div class="form-group">
+              <label>Subject <span class="required">*</span></label>
+              <app-searchable-select [options]="subjectOptions" formControlName="subjectId" placeholder="Select Subject"></app-searchable-select>
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <app-custom-datepicker formControlName="examDate"></app-custom-datepicker>
+            </div>
+            <div class="form-group">
+              <label>Start Time</label>
+              <input type="time" class="form-control" formControlName="startTime" />
+            </div>
+            <div class="form-group">
+              <label>End Time</label>
+              <input type="time" class="form-control" formControlName="endTime" />
+            </div>
+            <div class="form-group">
+              <label>Room / Note</label>
+              <input type="text" class="form-control" formControlName="roomNote" placeholder="e.g. Room 12" />
+            </div>
+          </div>
+          <div class="adjust-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="saving">
+              {{ saving ? 'Adding...' : '+ Add to Routine' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Subject</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Room / Note</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (loadingRows) {
+              <tr><td colspan="6" class="text-center" style="padding:32px;color:var(--text-muted);">Loading...</td></tr>
+            } @else if (rows.length === 0) {
+              <tr><td colspan="6" class="text-center" style="padding:32px;color:var(--text-muted);">No routine slots yet — add one above.</td></tr>
+            } @else {
+              @for (row of rows; track row.examSubjectId) {
+                <tr>
+                  <td>{{ row.className ?? '—' }}</td>
+                  <td>
+                    {{ row.subjectName ?? '—' }}
+                    @if (row.subjectCode) {
+                      <span style="color:var(--text-muted);font-size:12px;"> ({{ row.subjectCode }})</span>
+                    }
+                  </td>
+                  <td>{{ row.examDate ? (row.examDate | date:'dd MMM yyyy') : '—' }}</td>
+                  <td>
+                    @if (row.startTime && row.endTime) {
+                      {{ row.startTime }} - {{ row.endTime }}
+                    } @else if (row.startTime) {
+                      {{ row.startTime }}
+                    } @else {
+                      —
+                    }
+                  </td>
+                  <td>{{ row.roomNote ?? '—' }}</td>
+                  <td style="text-align:right;">
+                    <button type="button" class="btn-outline-light" style="padding:2px 10px;font-size:12px;" (click)="removeSlot(row)">
+                      <app-icon name="trash" [size]="12"></app-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

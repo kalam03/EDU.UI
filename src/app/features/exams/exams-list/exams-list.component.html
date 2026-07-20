@@ -1,14 +1,19 @@
 <div class="panel">
   <div class="panel-header">
     <span class="panel-title">Exams</span>
-    <a routerLink="/exams/new" class="btn-outline-light">+ Add Exam</a>
+    <div style="display:flex;gap:8px;">
+      <a routerLink="/exams/routine" class="btn-outline-light">Exam Routine</a>
+      <a routerLink="/exams/new" class="btn-outline-light">+ Add Exam</a>
+    </div>
   </div>
   <div class="panel-body">
     <app-data-table
       [columns]="columns"
       [data]="$any(exams)"
       [loading]="loading"
+      [showView]="true"
       searchPlaceholder="Search exams..."
+      (view)="onRoutine($event)"
       (edit)="onEdit($event)"
       (delete)="onDelete($event)"
     />

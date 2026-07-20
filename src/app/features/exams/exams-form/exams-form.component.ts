@@ -16,7 +16,12 @@ export class ExamsFormComponent implements OnInit {
   private authService = inject(AuthService);
   id: number | null = null; loading = false; saving = false; error = '';
   classOptions: SelectOption[] = [];
-  form = this.fb.group({ examName: ['', Validators.required], classId: [null as number | null], sectionId: [null as number | null], groupId: [null as number | null], examDate: [''], startTime: [''], endTime: [''], schoolEiin: [this.authService.schoolEiin] });
+  shiftOptions: SelectOption[] = [
+    { value: 'Morning', label: 'Morning' },
+    { value: 'Day', label: 'Day' },
+    { value: 'Evening', label: 'Evening' }
+  ];
+  form = this.fb.group({ examName: ['', Validators.required], classId: [null as number | null], sectionId: [null as number | null], groupId: [null as number | null], examDate: [''], startTime: [''], endTime: [''], shiftName: [null as string | null], schoolEiin: [this.authService.schoolEiin] });
   get isEdit(): boolean { return this.id !== null; }
   ngOnInit(): void {
     this.classService.list().subscribe(c => { this.classOptions = c.map(x => ({ value: x.classId, label: x.className })); });

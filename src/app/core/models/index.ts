@@ -163,6 +163,7 @@ export interface Exam {
   examDate?: string;
   startTime?: string;
   endTime?: string;
+  shiftName?: string;
   authStatus?: string;
   schoolEiin?: string;
 }
@@ -172,7 +173,32 @@ export interface ExamSubject {
   examSubjectId: number;
   examId: number;
   subjectId: number;
+  classId?: number;
+  examDate?: string;
+  startTime?: string;
+  endTime?: string;
+  roomNote?: string;
   authStatus?: string;
+  schoolEiin?: string;
+}
+
+/** One printable/on-screen row of an exam routine — an ExamSubject slot joined with its
+ *  Exam/Class/Subject names (see GET /api/examsubjects/routine/{examId}). */
+export interface ExamRoutineRow {
+  examSubjectId: number;
+  examId: number;
+  examName: string;
+  classId?: number;
+  className?: string;
+  subjectId: number;
+  subjectName?: string;
+  subjectCode?: string;
+  examDate?: string;
+  startTime?: string;
+  endTime?: string;
+  roomNote?: string;
+  authStatus?: string;
+  schoolEiin?: string;
 }
 
 // ── Mark ──────────────────────────────────────────────────────────────────────

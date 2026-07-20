@@ -38,9 +38,15 @@
             <input type="time" class="form-control" formControlName="endTime" />
           </div>
         </div>
-        <div class="form-group">
-          <label>School EIIN</label>
-          <input type="text" class="form-control" formControlName="schoolEiin" placeholder="School EIIN" />
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Shift</label>
+            <app-searchable-select [options]="shiftOptions" formControlName="shiftName" placeholder="Select Shift"></app-searchable-select>
+          </div>
+          <div class="form-group">
+            <label>School EIIN</label>
+            <input type="text" class="form-control" formControlName="schoolEiin" placeholder="School EIIN" />
+          </div>
         </div>
       </div>
       <div class="panel-footer">

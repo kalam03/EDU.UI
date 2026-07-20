@@ -17,4 +17,5 @@ export class ExamsListComponent implements OnInit {
   load(): void { this.loading = true; this.examService.list().subscribe({ next: d => { this.exams = d; this.loading = false; }, error: () => { this.loading = false; } }); }
   onEdit(row: Record<string, unknown>): void { this.router.navigate(['/exams', row['examId'], 'edit']); }
   onDelete(row: Record<string, unknown>): void { if (confirm('Delete?')) this.examService.delete(row['examId'] as number).subscribe(() => this.load()); }
+  onRoutine(row: Record<string, unknown>): void { this.router.navigate(['/exams/routine'], { queryParams: { examId: row['examId'] } }); }
 }

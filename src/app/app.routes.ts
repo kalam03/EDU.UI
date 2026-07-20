@@ -111,6 +111,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/exams/exams-form/exams-form.component').then(m => m.ExamsFormComponent)
       },
       {
+        path: 'exams/routine',
+        loadComponent: () => import('./features/exams/exam-routine/exam-routine.component').then(m => m.ExamRoutineComponent)
+      },
+      {
         path: 'marks',
         loadComponent: () => import('./features/marks/marks-list/marks-list.component').then(m => m.MarksListComponent)
       },
