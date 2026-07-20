@@ -6,6 +6,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExamService } from '../../../core/services/exam.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ClassService } from '../../../core/services/class.service';
+import { SectionService } from '../../../core/services/section.service';
+import { GroupService } from '../../../core/services/group.service';
 import { SelectOption, SearchableSelectComponent } from '../../../common/searchable-select/searchable-select.component';
 import { CustomDatepickerComponent } from '../../../shared/components/custom-datepicker/custom-datepicker.component';
 
@@ -14,8 +16,11 @@ export class ExamsFormComponent implements OnInit {
   private fb = inject(FormBuilder); private examService = inject(ExamService);
   private classService = inject(ClassService); private route = inject(ActivatedRoute); private router = inject(Router);
   private authService = inject(AuthService);
+  private sectionService = inject(SectionService); private groupService = inject(GroupService);
   id: number | null = null; loading = false; saving = false; error = '';
   classOptions: SelectOption[] = [];
+  sectionOptions: SelectOption[] = [];
+  groupOptions: SelectOption[] = [];
   shiftOptions: SelectOption[] = [
     { value: 'Morning', label: 'Morning' },
     { value: 'Day', label: 'Day' },
@@ -26,7 +31,50 @@ export class ExamsFormComponent implements OnInit {
   ngOnInit(): void {
     this.classService.list().subscribe(c => { this.classOptions = c.map(x => ({ value: x.classId, label: x.className })); });
     const p = this.route.snapshot.paramMap.get('id');
-    if (p) { this.id = +p; this.loading = true; this.examService.fetch(this.id).subscribe({ next: e => { this.form.patchValue(e as any); this.loading = false; }, error: () => { this.loading = false; } }); }
+    if (p) {
+      this.id = +p; this.loading = true;
+      this.examService.fetch(this.id).subscribe({
+        next: e => {
+          this.form.patchValue(e as any);
+          if (e.classId) {
+            // Restore this exam's section/group options without wiping the values we just
+            // patched — a *user-driven* class change (see the template binding below) should
+            // reset section/group, but loading an existing exam's saved class should not.
+            this.onClassChange(e.classId, false, e.sectionId ?? null, e.groupId ?? null);
+          }
+          this.loading = false;
+        },
+        error: () => { this.loading = false; }
+      });
+    }
+  }
+
+  /**
+   * @param resetChildren When true (the default, used when the user picks a different class in the
+   *   form), clears the section/group selections since they belonged to the previous class —
+   *   Section and Group are always scoped to the selected Class.
+   *   When false (used only when restoring an existing exam on load), the just-loaded
+   *   section/group ids are re-applied once their option lists arrive.
+   */
+  onClassChange(classId: number | null, resetChildren = true, restoreSectionId: number | null = null, restoreGroupId: number | null = null): void {
+    this.sectionOptions = [];
+    this.groupOptions = [];
+    if (resetChildren) {
+      this.form.patchValue({ sectionId: null, groupId: null });
+    }
+    if (!classId) return;
+    this.sectionService.getByClass(classId).subscribe(s => {
+      this.sectionOptions = s.map(x => ({ value: x.sectionId, label: x.sectionName ?? '' }));
+      if (!resetChildren && restoreSectionId != null) {
+        this.form.patchValue({ sectionId: restoreSectionId });
+      }
+    });
+    this.groupService.getByClass(classId).subscribe(g => {
+      this.groupOptions = g.map(x => ({ value: x.groupId, label: x.groupName ?? '' }));
+      if (!resetChildren && restoreGroupId != null) {
+        this.form.patchValue({ groupId: restoreGroupId });
+      }
+    });
   }
   onSubmit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }

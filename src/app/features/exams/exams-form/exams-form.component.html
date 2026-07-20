@@ -21,7 +21,17 @@
           </div>
           <div class="form-group">
             <label>Class</label>
-            <app-searchable-select [options]="classOptions" formControlName="classId" placeholder="Select Class"></app-searchable-select>
+            <app-searchable-select [options]="classOptions" formControlName="classId" placeholder="Select Class" (valueChange)="onClassChange($any($event))"></app-searchable-select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Section</label>
+            <app-searchable-select [options]="sectionOptions" formControlName="sectionId" placeholder="Select Class first"></app-searchable-select>
+          </div>
+          <div class="form-group">
+            <label>Group</label>
+            <app-searchable-select [options]="groupOptions" formControlName="groupId" placeholder="Select Class first"></app-searchable-select>
           </div>
         </div>
         <div class="grid-3">
