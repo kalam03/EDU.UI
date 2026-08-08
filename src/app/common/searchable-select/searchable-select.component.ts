@@ -1,6 +1,6 @@
 import {
   Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy,
-  SimpleChanges, forwardRef, HostListener, ElementRef, ViewChild
+  SimpleChanges, forwardRef, ElementRef, ViewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -45,8 +45,11 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
 
   constructor(private elRef: ElementRef) {}
 
-  @HostListener('document:click', ['$event'])
+  // Bound once so add/removeEventListener refer to the same function reference.
+  private readonly boundOnOutside = (e: MouseEvent) => this.onOutside(e);
+
   onOutside(e: MouseEvent) {
+    if (!this.isOpen) return;
     const target = e.target as Node;
     const insideHost = this.elRef.nativeElement.contains(target);
     // The panel is portaled to <body> once open (see portalToBody), so it's no longer a
@@ -56,7 +59,19 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
     if (!insideHost && !insideDropdown) this.close();
   }
 
-  ngOnInit() { this.filteredOptions = [...this.options]; }
+  ngOnInit() {
+    this.filteredOptions = [...this.options];
+    // Registered on the CAPTURE phase (the `true` third arg), not the default bubble phase a
+    // `@HostListener('document:click')` would use. Capture-phase listeners on `document` run
+    // before the event ever reaches any element in the page, so they fire even when something
+    // further down the tree (a modal panel, a table row, anything) calls `$event.stopPropagation()`
+    // during the bubble phase — that stops the event from bubbling back up to `document`, but it
+    // can't undo a capture-phase listener that already ran on the way down. This is what makes
+    // "click anywhere to close" reliable no matter what other components on the page do with their
+    // own click handlers, present or future, instead of having to special-case every container the
+    // dropdown might be opened inside of.
+    document.addEventListener('click', this.boundOnOutside, true);
+  }
 
   ngOnChanges(c: SimpleChanges) {
     if (c['options']) {
@@ -106,7 +121,10 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
     this.detachRepositionListeners();
   }
 
-  ngOnDestroy(): void { this.detachRepositionListeners(); }
+  ngOnDestroy(): void {
+    this.detachRepositionListeners();
+    document.removeEventListener('click', this.boundOnOutside, true);
+  }
 
   /// The dropdown panel is `position: fixed` (so it can escape any card's `overflow: hidden`
   /// without being clipped), positioned from the trigger's viewport-relative coordinates. Those

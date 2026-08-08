@@ -105,6 +105,16 @@ export class ClassRoutineComponent implements OnInit {
     this.editingCell = null;
   }
 
+  /** Closes the popup only when the backdrop itself was clicked (not a bubbled click from inside
+   *  the popup). Deliberately does NOT call `$event.stopPropagation()` on the inner panel — the
+   *  <app-searchable-select> dropdowns inside this popup close themselves via a `document:click`
+   *  listener, so a click has to be allowed to bubble all the way up to `document` for "click
+   *  anywhere outside the dropdown" to close it. Stopping propagation here was trapping those
+   *  clicks and left the dropdown stuck open unless an option was actually picked. */
+  onBackdropClick(e: MouseEvent): void {
+    if (e.target === e.currentTarget) this.closeCellEditor();
+  }
+
   onClassChange(classId: number | null): void {
     this.selectedClassId = classId;
     this.selectedSectionId = null;

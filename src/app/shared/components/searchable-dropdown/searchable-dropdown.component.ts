@@ -1,6 +1,6 @@
 import {
-  Component, Input, Output, EventEmitter, OnInit, OnChanges,
-  SimpleChanges, forwardRef, HostListener, ElementRef, ViewChild
+  Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy,
+  SimpleChanges, forwardRef, ElementRef, ViewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -22,7 +22,7 @@ export interface DropdownOption {
     multi: true
   }]
 })
-export class SearchableDropdownComponent implements ControlValueAccessor, OnInit, OnChanges {
+export class SearchableDropdownComponent implements ControlValueAccessor, OnInit, OnChanges, OnDestroy {
   @Input() options: DropdownOption[] = [];
   @Input() placeholder = 'Select...';
   @Input() disabled = false;
@@ -44,12 +44,24 @@ export class SearchableDropdownComponent implements ControlValueAccessor, OnInit
 
   constructor(private elRef: ElementRef) {}
 
-  @HostListener('document:click', ['$event'])
+  private readonly boundOnOutside = (e: MouseEvent) => this.onOutside(e);
+
   onOutside(e: MouseEvent) {
+    if (!this.isOpen) return;
     if (!this.elRef.nativeElement.contains(e.target)) this.close();
   }
 
-  ngOnInit() { this.filteredOptions = [...this.options]; }
+  ngOnInit() {
+    this.filteredOptions = [...this.options];
+    // Capture phase so a container's `$event.stopPropagation()` on the bubble phase (a modal
+    // panel, a table row, etc.) can't prevent the click from being seen here — see the identical
+    // fix/comment in the common SearchableSelectComponent for the full explanation.
+    document.addEventListener('click', this.boundOnOutside, true);
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('click', this.boundOnOutside, true);
+  }
 
   ngOnChanges(c: SimpleChanges) {
     if (c['options']) {

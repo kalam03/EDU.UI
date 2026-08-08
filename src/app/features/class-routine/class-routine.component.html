@@ -86,8 +86,8 @@
     }
 
     @if (editingCell) {
-      <div class="cell-editor-backdrop" (click)="closeCellEditor()">
-        <div class="cell-editor" (click)="$event.stopPropagation()">
+      <div class="cell-editor-backdrop" (click)="onBackdropClick($event)">
+        <div class="cell-editor">
           <div class="cell-editor-header">
             <span>{{ editingCell.day }} &bull; Period {{ editingCell.period }}</span>
             <button type="button" class="cell-editor-close" (click)="closeCellEditor()">&times;</button>
