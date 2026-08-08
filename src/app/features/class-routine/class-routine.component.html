@@ -1,0 +1,73 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Class Routine</span>
+  </div>
+  <div class="panel-body">
+    @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+
+    <div class="filter-bar">
+      <div class="form-group">
+        <label>Class <span class="required">*</span></label>
+        <app-searchable-select [options]="classOptions" [ngModel]="selectedClassId"
+          (ngModelChange)="onClassChange($any($event))" placeholder="Select Class"></app-searchable-select>
+      </div>
+      <div class="form-group">
+        <label>Section</label>
+        <app-searchable-select [options]="sectionOptions" [ngModel]="selectedSectionId"
+          (ngModelChange)="selectedSectionId = $any($event); onSectionOrGroupChange()" placeholder="All Sections"></app-searchable-select>
+      </div>
+      <div class="form-group">
+        <label>Group</label>
+        <app-searchable-select [options]="groupOptions" [ngModel]="selectedGroupId"
+          (ngModelChange)="selectedGroupId = $any($event); onSectionOrGroupChange()" placeholder="No Group"></app-searchable-select>
+      </div>
+      <button type="button" class="btn btn-secondary" [disabled]="!selectedClassId" (click)="addPeriod()">
+        + Add Period
+      </button>
+    </div>
+
+    @if (!selectedClassId) {
+      <div class="empty-hint">Select a class above to view or build its weekly routine.</div>
+    } @else if (loading) {
+      <div class="form-loading">Loading routine...</div>
+    } @else {
+      <div class="routine-scroll">
+        <table class="routine-table">
+          <thead>
+            <tr>
+              <th class="period-col">Period</th>
+              @for (day of days; track day) {
+                <th>{{ day }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (period of periods; track period) {
+              <tr>
+                <td class="period-col">{{ period }}</td>
+                @for (day of days; track day) {
+                  <td class="routine-cell" [class.saving]="cell(day, period).saving">
+                    <app-searchable-select
+                      [options]="subjectOptions"
+                      [ngModel]="cell(day, period).subjectId"
+                      (ngModelChange)="onSubjectChange(day, period, $any($event))"
+                      placeholder="Subject"></app-searchable-select>
+                    <app-searchable-select
+                      [options]="eligibleTeachers(day, period)"
+                      [ngModel]="cell(day, period).teacherId"
+                      (ngModelChange)="onTeacherChange(day, period, $any($event))"
+                      [disabled]="!cell(day, period).subjectId"
+                      placeholder="Teacher"></app-searchable-select>
+                    @if (cell(day, period).subjectId) {
+                      <button type="button" class="clear-cell-btn" (click)="clearCell(day, period)">Clear</button>
+                    }
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

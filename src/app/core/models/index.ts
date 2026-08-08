@@ -162,6 +162,69 @@ export interface Student {
   schoolEiin?: string;
 }
 
+// ── Teacher ───────────────────────────────────────────────────────────────────
+export interface Teacher {
+  teacherId: number;
+  userId?: number;
+  employeeNo: string;
+  firstName: string;
+  lastName?: string;
+  fatherName?: string;
+  motherName?: string;
+  dob?: string;
+  gender?: string;
+  mobileNumber?: string;
+  email?: string;
+  address?: string;
+  nidNumber?: string;
+  bloodGroup?: string;
+  nationality?: string;
+  religion?: string;
+  teacherImage?: string;
+  designation?: string;
+  educationQualification?: string;
+  employmentType?: string;
+  joiningDate?: string;
+  salary?: number;
+  bankAccount?: string;
+  emergencyContact?: string;
+  authStatus?: string;
+  schoolEiin?: string;
+  /** Populated only by GetById — this teacher's current subject/class/section assignments. */
+  assignments?: TeacherSubjectAssignment[];
+}
+
+/** One "this teacher teaches Subject X to Class/Section/Group Y" row. */
+export interface TeacherSubjectAssignment {
+  teacherSubjectId?: number;
+  teacherId: number;
+  subjectId: number;
+  subjectName?: string;
+  classId: number;
+  sectionId?: number | null;
+  groupId?: number | null;
+  teacherName?: string;
+  schoolEiin?: string;
+}
+
+// ── Class Routine ─────────────────────────────────────────────────────────────
+export const DAYS_OF_WEEK = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] as const;
+
+export interface ClassRoutine {
+  classRoutineId: number;
+  classId: number;
+  sectionId?: number | null;
+  groupId?: number | null;
+  dayOfWeek: string;
+  periodNo: number;
+  startTime?: string;
+  endTime?: string;
+  subjectId: number;
+  teacherId?: number | null;
+  roomNo?: string;
+  schoolEiin?: string;
+}
+
 // ── Attendance ────────────────────────────────────────────────────────────────
 export interface Attendance {
   attendanceId: number;

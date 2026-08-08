@@ -1,0 +1,96 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Teacher Details</span>
+    <div class="d-flex gap-2">
+      @if (teacher) {
+        <a [routerLink]="['/teachers', teacher.teacherId, 'edit']" class="btn-outline-light">Edit</a>
+        <button type="button" class="btn-outline-light" (click)="onDelete()">Delete</button>
+      }
+      <a routerLink="/teachers" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back to List</a>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    @if (loading) {
+      <div class="form-loading">Loading...</div>
+    } @else if (error) {
+      <div class="alert alert-danger">{{ error }}</div>
+    } @else if (teacher) {
+      <div class="detail-header">
+        <div class="detail-photo">
+          @if (teacherImageUrl) {
+            <img [src]="teacherImageUrl" alt="Teacher photo" />
+          } @else {
+            <div class="detail-photo-placeholder"><app-icon name="user" [size]="32"></app-icon></div>
+          }
+        </div>
+        <div class="detail-identity">
+          <div class="detail-name">{{ teacher.firstName }} {{ teacher.lastName ?? '' }}</div>
+          <div class="detail-sub">
+            Employee No: <strong>{{ teacher.employeeNo }}</strong>
+            <span class="badge" [ngClass]="teacher.authStatus === 'A' ? 'badge-success' : 'badge-warning'" style="margin-left:10px;">
+              {{ teacher.authStatus === 'A' ? 'Active' : (teacher.authStatus === 'D' ? 'Deleted' : 'Pending') }}
+            </span>
+          </div>
+          <div class="detail-sub">{{ teacher.designation ?? '—' }} @if (teacher.employmentType) { ({{ teacher.employmentType }}) }</div>
+          <div class="detail-sub">{{ teacher.educationQualification ?? '—' }}</div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Personal Information</div>
+        <div class="detail-grid">
+          <div><span class="detail-label">Father's Name</span><span class="detail-value">{{ teacher.fatherName ?? '—' }}</span></div>
+          <div><span class="detail-label">Mother's Name</span><span class="detail-value">{{ teacher.motherName ?? '—' }}</span></div>
+          <div><span class="detail-label">Date of Birth</span><span class="detail-value">{{ teacher.dob ? (teacher.dob | date:'dd MMM yyyy') : '—' }}</span></div>
+          <div><span class="detail-label">Gender</span><span class="detail-value">{{ teacher.gender ?? '—' }}</span></div>
+          <div><span class="detail-label">Mobile Number</span><span class="detail-value">{{ teacher.mobileNumber ?? '—' }}</span></div>
+          <div><span class="detail-label">Email</span><span class="detail-value">{{ teacher.email ?? '—' }}</span></div>
+          <div><span class="detail-label">NID Number</span><span class="detail-value">{{ teacher.nidNumber ?? '—' }}</span></div>
+          <div><span class="detail-label">Blood Group</span><span class="detail-value">{{ teacher.bloodGroup ?? '—' }}</span></div>
+          <div><span class="detail-label">Nationality</span><span class="detail-value">{{ teacher.nationality ?? '—' }}</span></div>
+          <div><span class="detail-label">Religion</span><span class="detail-value">{{ teacher.religion ?? '—' }}</span></div>
+          <div><span class="detail-label">Emergency Contact</span><span class="detail-value">{{ teacher.emergencyContact ?? '—' }}</span></div>
+          <div style="grid-column: 1 / -1;"><span class="detail-label">Address</span><span class="detail-value">{{ teacher.address ?? '—' }}</span></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Employment Information</div>
+        <div class="detail-grid">
+          <div><span class="detail-label">Joining Date</span><span class="detail-value">{{ teacher.joiningDate ? (teacher.joiningDate | date:'dd MMM yyyy') : '—' }}</span></div>
+          <div><span class="detail-label">Salary</span><span class="detail-value">{{ teacher.salary ? ('৳' + (teacher.salary | number:'1.2-2')) : '—' }}</span></div>
+          <div><span class="detail-label">Bank Account</span><span class="detail-value">{{ teacher.bankAccount ?? '—' }}</span></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Subjects &amp; Classes</div>
+        @if (!teacher.assignments || teacher.assignments.length === 0) {
+          <div style="padding:12px;color:var(--text-muted);">No subject/class assignments yet.</div>
+        } @else {
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Class</th>
+                <th>Section</th>
+                <th>Group</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (a of teacher.assignments; track a.teacherSubjectId) {
+                <tr>
+                  <td>{{ a.subjectName ?? '—' }}</td>
+                  <td>{{ className(a.classId) }}</td>
+                  <td>{{ sectionName(a.sectionId) }}</td>
+                  <td>{{ groupName(a.groupId) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+  </div>
+</div>

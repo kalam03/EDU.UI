@@ -1,0 +1,20 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Teachers</span>
+    <div class="d-flex gap-2">
+      <a routerLink="/teachers/new" class="btn-outline-light">+ Add Teacher</a>
+    </div>
+  </div>
+  <div class="panel-body">
+    <app-data-table
+      [columns]="columns"
+      [data]="$any(teachers)"
+      [loading]="loading"
+      [showView]="true"
+      searchPlaceholder="Search by name, employee no..."
+      (view)="onView($event)"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+    />
+  </div>
+</div>
