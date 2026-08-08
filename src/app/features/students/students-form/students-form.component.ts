@@ -57,26 +57,38 @@ export class StudentsFormComponent implements OnInit {
     { value: 'Female', label: 'Female' },
     { value: 'Other',  label: 'Other' }
   ];
+  // Covers a reasonable admission window: 5 years back through 1 year ahead of today,
+  // newest first so the current year is easy to find at the top of the list.
+  // Values are strings to match EnrollmentYear's NVARCHAR storage on the backend —
+  // otherwise a loaded student's saved year (e.g. "2024") wouldn't match a numeric option.
+  enrollmentYearOptions: SelectOption[] = (() => {
+    const current = new Date().getFullYear();
+    const years: SelectOption[] = [];
+    for (let y = current + 1; y >= current - 5; y--) years.push({ value: String(y), label: String(y) });
+    return years;
+  })();
 
   form = this.fb.group({
     admissionNo:      [{ value: '', disabled: true }, Validators.required],
     firstName:        ['', Validators.required],
     lastName:         [''],
-    fatherName:       [''],
-    motherName:       [''],
-    dob:              [''],
-    gender:           [''],
+    fatherName:       ['', Validators.required],
+    motherName:       ['', Validators.required],
+    dob:              ['', Validators.required],
+    gender:           ['', Validators.required],
     mobileNumber:     ['', Validators.pattern(/^[0-9+\-\s]{7,20}$/)],
     email:            ['', Validators.email],
     address:          [''],
     classId:          [null as number | null, Validators.required],
-    sectionId:        [null as number | null],
+    sectionId:        [null as number | null, Validators.required],
     groupId:          [null as number | null],
-    enrollmentYear:   [''],
+    enrollmentYear:   [String(new Date().getFullYear()), Validators.required],
     guardianName:     [''],
-    guardianContact:  ['', Validators.pattern(/^[0-9+\-\s]{7,20}$/)],
+    guardianContact:  ['', [Validators.required, Validators.pattern(/^[0-9+\-\s]{7,20}$/)]],
     guardianRelation: [''],
-    tuitionFee:       [null as number | null],
+    // Tuition fee is not editable here — it's assigned/adjusted from the Fee Management
+    // pages (fee types + fee assignment). New students always start at 0 due.
+    tuitionFee:       [{ value: 0, disabled: true }],
     schoolEiin:       [this.authService.schoolEiin]
   });
 

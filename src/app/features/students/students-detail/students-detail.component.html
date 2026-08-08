@@ -3,6 +3,7 @@
     <span class="panel-title">Student Details</span>
     <div class="d-flex gap-2">
       @if (student) {
+        <a [routerLink]="['/students', student.studentId, 'admission-form']" class="btn-outline-light"><app-icon name="printer" [size]="14"></app-icon> Admission Form</a>
         <a [routerLink]="['/students', student.studentId, 'edit']" class="btn-outline-light">Edit</a>
         <button type="button" class="btn-outline-light" (click)="onDelete()">Delete</button>
       }

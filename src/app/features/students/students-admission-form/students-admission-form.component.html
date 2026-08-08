@@ -1,0 +1,100 @@
+<div class="panel">
+  <div class="panel-header no-print">
+    <span class="panel-title">Student Admission Form</span>
+    <div class="d-flex gap-2">
+      @if (student) {
+        <button type="button" class="btn-outline-light" (click)="print()"><app-icon name="printer" [size]="14"></app-icon> Print</button>
+      }
+      <a [routerLink]="['/students', student?.studentId]" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back to Details</a>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    @if (loading) {
+      <div class="form-loading">Loading...</div>
+    } @else if (error) {
+      <div class="alert alert-danger">{{ error }}</div>
+    } @else if (student) {
+      <div class="adm-page">
+        <div class="adm-header">
+          <div class="adm-school-name">{{ school?.schoolName ?? 'School Name' }}</div>
+          <div class="adm-school-meta">
+            {{ school?.address ?? '' }}
+            @if (school?.schoolEiin) { <span> &nbsp;|&nbsp; EIIN: {{ school?.schoolEiin }}</span> }
+          </div>
+          <div class="adm-form-title">Student Admission Form</div>
+        </div>
+
+        <div class="adm-top">
+          <div class="adm-top-fields">
+            <div class="adm-row">
+              <span class="adm-label">Admission No</span>
+              <span class="adm-value adm-strong">{{ student.admissionNo }}</span>
+              <span class="adm-label">Enrollment Year</span>
+              <span class="adm-value adm-strong">{{ student.enrollmentYear ?? '—' }}</span>
+            </div>
+            <div class="adm-row">
+              <span class="adm-label">Full Name</span>
+              <span class="adm-value adm-strong adm-wide">{{ student.firstName }} {{ student.lastName ?? '' }}</span>
+            </div>
+            <div class="adm-row">
+              <span class="adm-label">Class</span>
+              <span class="adm-value">{{ className }}</span>
+              <span class="adm-label">Section</span>
+              <span class="adm-value">{{ sectionName }}</span>
+            </div>
+            <div class="adm-row">
+              <span class="adm-label">Group</span>
+              <span class="adm-value">{{ groupName }}</span>
+              <span class="adm-label">Gender</span>
+              <span class="adm-value">{{ student.gender ?? '—' }}</span>
+            </div>
+            <div class="adm-row">
+              <span class="adm-label">Date of Birth</span>
+              <span class="adm-value">{{ student.dob ? (student.dob | date:'dd MMM yyyy') : '—' }}</span>
+            </div>
+          </div>
+
+          <div class="adm-photo-box">
+            @if (studentImageUrl) {
+              <img [src]="studentImageUrl" alt="Student photo" />
+            } @else {
+              <div class="adm-photo-placeholder"><app-icon name="user" [size]="32"></app-icon></div>
+            }
+            <div class="adm-photo-caption">Student Photo</div>
+          </div>
+        </div>
+
+        <div class="adm-section">
+          <div class="adm-section-title">Family Information</div>
+          <div class="adm-grid">
+            <div><span class="adm-label">Father's Name</span><span class="adm-value">{{ student.fatherName ?? '—' }}</span></div>
+            <div><span class="adm-label">Mother's Name</span><span class="adm-value">{{ student.motherName ?? '—' }}</span></div>
+            <div><span class="adm-label">Mobile Number</span><span class="adm-value">{{ student.mobileNumber ?? '—' }}</span></div>
+            <div><span class="adm-label">Email</span><span class="adm-value">{{ student.email ?? '—' }}</span></div>
+            <div class="adm-full"><span class="adm-label">Address</span><span class="adm-value">{{ student.address ?? '—' }}</span></div>
+          </div>
+        </div>
+
+        <div class="adm-section">
+          <div class="adm-section-title">Guardian Information</div>
+          <div class="adm-grid">
+            <div><span class="adm-label">Guardian Name</span><span class="adm-value">{{ student.guardianName ?? '—' }}</span></div>
+            <div><span class="adm-label">Relation</span><span class="adm-value">{{ student.guardianRelation ?? '—' }}</span></div>
+            <div><span class="adm-label">Guardian Contact</span><span class="adm-value">{{ student.guardianContact ?? '—' }}</span></div>
+          </div>
+        </div>
+
+        <div class="adm-declaration">
+          I hereby declare that the information provided above is true and correct to the best of my knowledge.
+        </div>
+
+        <div class="adm-signatures">
+          <div class="adm-sign"><div class="adm-sign-line"></div>Guardian Signature</div>
+          <div class="adm-sign"><div class="adm-sign-line"></div>Class Teacher</div>
+          <div class="adm-sign"><div class="adm-sign-line"></div>Principal / Head of Institution</div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

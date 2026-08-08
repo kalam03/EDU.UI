@@ -35,6 +35,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/students/students-form/students-form.component').then(m => m.StudentsFormComponent)
       },
       {
+        path: 'students/:id/admission-form',
+        loadComponent: () => import('./features/students/students-admission-form/students-admission-form.component').then(m => m.StudentsAdmissionFormComponent)
+      },
+      {
         path: 'students/:id',
         loadComponent: () => import('./features/students/students-detail/students-detail.component').then(m => m.StudentsDetailComponent)
       },

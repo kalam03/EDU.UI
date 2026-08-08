@@ -1,0 +1,130 @@
+// A4 = 210mm x 297mm. On screen we render at that width (scaled down by the browser only
+// visually via max-width so it never overflows a narrow viewport); when printed, the @page
+// rule below locks the actual paper size so it always comes out as a true A4 page.
+.adm-page {
+  width: 210mm;
+  min-height: 280mm;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 14mm 16mm;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.adm-header {
+  text-align: center;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+}
+.adm-school-name { font-size: 20px; font-weight: 800; color: var(--primary); }
+.adm-school-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.adm-form-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  display: inline-block;
+}
+
+.adm-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+.adm-top-fields { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+
+.adm-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  padding-bottom: 6px;
+  border-bottom: 1px dotted var(--border);
+}
+.adm-label { color: var(--text-muted); min-width: 90px; }
+.adm-value { color: var(--text); font-weight: 600; margin-right: 18px; }
+.adm-strong { font-size: 14.5px; }
+.adm-wide { flex: 1; }
+
+// The photo box is a fixed, small, passport-photo-style rectangle — not the arbitrary
+// dimensions of whatever file was uploaded. `object-fit: cover` crops/scales any source
+// image (portrait, landscape, or a full A4-shaped scan) so it always fills this exact box
+// neatly, instead of rendering at the photo's own oversized native proportions.
+.adm-photo-box {
+  width: 35mm;
+  height: 45mm;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+.adm-photo-placeholder { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); width: 100%; }
+.adm-photo-caption { font-size: 9.5px; color: var(--text-muted); padding: 3px 0; border-top: 1px solid var(--border); width: 100%; text-align: center; }
+
+.adm-section { margin-bottom: 18px; }
+.adm-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.adm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+
+  > div { display: flex; flex-direction: column; gap: 2px; }
+  .adm-full { grid-column: 1 / -1; }
+}
+.adm-grid .adm-label { min-width: 0; }
+.adm-grid .adm-value { margin-right: 0; font-size: 13.5px; }
+
+.adm-declaration {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 22px 0 0;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+.adm-signatures {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-top: 50px;
+}
+.adm-sign { flex: 1; text-align: center; font-size: 11.5px; color: var(--text-muted); }
+.adm-sign-line { border-top: 1px solid var(--text); margin-bottom: 6px; height: 34px; }
+
+@media (max-width: 768px) {
+  .adm-top { flex-direction: column-reverse; align-items: center; }
+  .adm-grid { grid-template-columns: 1fr; }
+  .adm-signatures { flex-direction: column; gap: 20px; }
+}
+
+@media print {
+  @page { size: A4; margin: 12mm; }
+  .no-print { display: none !important; }
+  .panel-body { padding: 0; }
+  .adm-page { border: none; width: 100%; min-height: 0; padding: 0; }
+}
