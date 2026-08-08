@@ -24,6 +24,9 @@
       <button type="button" class="btn btn-secondary" [disabled]="!selectedClassId" (click)="addPeriod()">
         + Add Period
       </button>
+      <button type="button" class="btn btn-primary" [disabled]="!selectedClassId || printing" (click)="printRoutine()">
+        <app-icon name="printer" [size]="14"></app-icon> {{ printing ? 'Preparing...' : 'Print Routine' }}
+      </button>
     </div>
 
     @if (!selectedClassId) {
@@ -44,7 +47,15 @@
           <tbody>
             @for (period of periods; track period) {
               <tr>
-                <td class="period-col">{{ period }}</td>
+                <td class="period-col">
+                  <div class="period-no">Period {{ period }}</div>
+                  <input type="time" class="period-time-input"
+                    [ngModel]="periodTime(period).startTime"
+                    (ngModelChange)="onPeriodTimeChange(period, 'startTime', $event)" />
+                  <input type="time" class="period-time-input"
+                    [ngModel]="periodTime(period).endTime"
+                    (ngModelChange)="onPeriodTimeChange(period, 'endTime', $event)" />
+                </td>
                 @for (day of days; track day) {
                   <td class="routine-cell" [class.saving]="cell(day, period).saving">
                     <app-searchable-select

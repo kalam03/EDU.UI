@@ -9,6 +9,7 @@ import { TeacherService } from '../../core/services/teacher.service';
 import { ClassRoutineService } from '../../core/services/class-routine.service';
 import { ClassRoutine, DAYS_OF_WEEK, TeacherSubjectAssignment } from '../../core/models';
 import { SearchableSelectComponent, SelectOption } from '../../common/searchable-select/searchable-select.component';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 
 interface RoutineCell {
   classRoutineId: number | null;
@@ -18,10 +19,15 @@ interface RoutineCell {
   saving?: boolean;
 }
 
+interface PeriodTime {
+  startTime: string | null; // "HH:mm", the format <input type="time"> uses
+  endTime: string | null;
+}
+
 @Component({
   selector: 'app-class-routine',
   standalone: true,
-  imports: [CommonModule, FormsModule, SearchableSelectComponent],
+  imports: [CommonModule, FormsModule, SearchableSelectComponent, IconComponent],
   templateUrl: './class-routine.component.html',
   styleUrl: './class-routine.component.scss'
 })
@@ -46,11 +52,15 @@ export class ClassRoutineComponent implements OnInit {
   selectedGroupId: number | null = null;
 
   loading = false;
+  printing = false;
   error = '';
 
   private allAssignments: TeacherSubjectAssignment[] = [];
   /** Keyed by `${day}_${period}`. */
   cells: Record<string, RoutineCell> = {};
+  /** One start/end time per period, shared across all 7 days in that row — schools run the same
+   *  period-time slots every day, so the time is set once per row rather than per cell. */
+  periodTimes: Record<number, PeriodTime> = {};
 
   ngOnInit(): void {
     this.classService.list().subscribe(c => {
@@ -89,11 +99,13 @@ export class ClassRoutineComponent implements OnInit {
 
   private resetGrid(): void {
     this.cells = {};
+    this.periodTimes = {};
     for (const day of this.days) {
       for (const p of this.periods) {
         this.cells[this.key(day, p)] = { classRoutineId: null, subjectId: null, teacherId: null, roomNo: null };
       }
     }
+    for (const p of this.periods) this.periodTimes[p] = { startTime: null, endTime: null };
   }
 
   private key(day: string, period: number): string { return `${day}_${period}`; }
@@ -102,6 +114,22 @@ export class ClassRoutineComponent implements OnInit {
     const k = this.key(day, period);
     if (!this.cells[k]) this.cells[k] = { classRoutineId: null, subjectId: null, teacherId: null, roomNo: null };
     return this.cells[k];
+  }
+
+  periodTime(period: number): PeriodTime {
+    if (!this.periodTimes[period]) this.periodTimes[period] = { startTime: null, endTime: null };
+    return this.periodTimes[period];
+  }
+
+  /** "12:00:00" (API/TimeOnly) -> "12:00" (<input type="time"> format). */
+  private static toInputTime(v: string | null | undefined): string | null {
+    return v ? v.slice(0, 5) : null;
+  }
+
+  /** "12:00" (<input type="time">) -> "12:00:00" (API/TimeOnly format). */
+  private static toApiTime(v: string | null | undefined): string | undefined {
+    if (!v) return undefined;
+    return v.length === 5 ? `${v}:00` : v;
   }
 
   private loadRoutine(): void {
@@ -123,6 +151,15 @@ export class ClassRoutineComponent implements OnInit {
             teacherId: r.teacherId ?? null,
             roomNo: r.roomNo ?? null
           };
+          // First slot found for a period supplies that row's shared time — later slots in the
+          // same period are assumed to share it (they were all saved together via the time inputs).
+          if (!this.periodTimes[r.periodNo]) this.periodTimes[r.periodNo] = { startTime: null, endTime: null };
+          if (!this.periodTimes[r.periodNo].startTime && r.startTime) {
+            this.periodTimes[r.periodNo] = {
+              startTime: ClassRoutineComponent.toInputTime(r.startTime),
+              endTime: ClassRoutineComponent.toInputTime(r.endTime)
+            };
+          }
         }
         this.loading = false;
       },
@@ -156,6 +193,15 @@ export class ClassRoutineComponent implements OnInit {
     this.saveCell(day, period);
   }
 
+  /** Setting a period's time applies to every day already using that period — re-saves each
+   *  populated slot in the row so the new time is persisted everywhere it's used. */
+  onPeriodTimeChange(period: number, field: 'startTime' | 'endTime', value: string): void {
+    this.periodTime(period)[field] = value || null;
+    for (const day of this.days) {
+      if (this.cell(day, period).subjectId) this.saveCell(day, period);
+    }
+  }
+
   clearCell(day: string, period: number): void {
     const c = this.cell(day, period);
     if (!c.classRoutineId) { c.subjectId = null; c.teacherId = null; c.roomNo = null; return; }
@@ -181,12 +227,15 @@ export class ClassRoutineComponent implements OnInit {
 
     c.saving = true;
     this.error = '';
+    const pt = this.periodTime(period);
     const payload = {
       classId: this.selectedClassId,
       sectionId: this.selectedSectionId,
       groupId: this.selectedGroupId,
       dayOfWeek: day,
       periodNo: period,
+      startTime: ClassRoutineComponent.toApiTime(pt.startTime),
+      endTime: ClassRoutineComponent.toApiTime(pt.endTime),
       subjectId: c.subjectId,
       teacherId: c.teacherId,
       roomNo: c.roomNo
@@ -202,6 +251,23 @@ export class ClassRoutineComponent implements OnInit {
         if (!c.classRoutineId && res.data) c.classRoutineId = (res.data as ClassRoutine).classRoutineId;
       },
       error: () => { c.saving = false; this.error = 'Failed to save slot.'; }
+    });
+  }
+
+  /** Downloads the whole-week routine as a PDF (server-rendered) and opens it in a new tab, ready
+   *  to print — mirroring the Exam Routine page's print button. */
+  printRoutine(): void {
+    if (!this.selectedClassId) return;
+    this.printing = true;
+    this.error = '';
+    this.routineService.downloadPdf(this.selectedClassId, this.selectedSectionId, this.selectedGroupId).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        this.printing = false;
+      },
+      error: () => { this.error = 'Failed to generate the routine PDF.'; this.printing = false; }
     });
   }
 }

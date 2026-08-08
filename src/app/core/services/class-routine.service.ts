@@ -18,4 +18,12 @@ export class ClassRoutineService extends BaseApiService<ClassRoutine> {
     if (groupId != null) url += `&groupId=${groupId}`;
     return this.http2.get<ApiResponse<ClassRoutine[]>>(url).pipe(map(r => r.data ?? []));
   }
+
+  /** Server-rendered (QuestPDF) whole-week routine, as a downloadable/printable PDF blob. */
+  downloadPdf(classId: number, sectionId?: number | null, groupId?: number | null): Observable<Blob> {
+    let url = `${environment.apiUrl}/classroutines/pdf?classId=${classId}`;
+    if (sectionId != null) url += `&sectionId=${sectionId}`;
+    if (groupId != null) url += `&groupId=${groupId}`;
+    return this.http2.get(url, { responseType: 'blob' });
+  }
 }
