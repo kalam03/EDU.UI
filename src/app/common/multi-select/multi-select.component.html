@@ -1,0 +1,43 @@
+<div class="ms-wrapper" [class.open]="isOpen" [class.disabled]="disabled">
+  <div class="ms-trigger" #trigger (click)="toggleDropdown()" (keydown)="onKeyDown($event)" tabindex="0">
+    @if (selectedOptions.length) {
+      <span class="ms-chips">
+        @for (opt of selectedOptions; track opt.value) {
+          <span class="ms-chip">
+            {{ opt.label }}
+            <button type="button" class="ms-chip-remove" (click)="removeChip(opt.value, $event)">&#215;</button>
+          </span>
+        }
+      </span>
+    } @else {
+      <span class="ms-placeholder">{{ placeholder }}</span>
+    }
+    <span class="ms-arrow" [class.up]="isOpen">&#9662;</span>
+  </div>
+
+  <div class="ms-dropdown" *ngIf="isOpen" #dropdownPanel
+    [style.top.px]="dropTop" [style.left.px]="dropLeft" [style.width.px]="dropWidth">
+    <div class="ms-search-box">
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()"
+        placeholder="Search..."
+        class="ms-search"
+        (click)="$event.stopPropagation()"
+      />
+    </div>
+    <ul class="ms-list">
+      <li *ngIf="!filteredOptions.length" class="ms-empty">No results found</li>
+      <li
+        *ngFor="let opt of filteredOptions"
+        class="ms-option"
+        [class.selected]="isSelected(opt)"
+        (click)="toggleOption(opt)"
+      >
+        <span class="ms-checkbox" [class.checked]="isSelected(opt)"></span>
+        {{ opt.label }}
+      </li>
+    </ul>
+  </div>
+</div>

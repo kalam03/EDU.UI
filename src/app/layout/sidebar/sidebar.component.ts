@@ -34,6 +34,7 @@ export class SidebarComponent {
     { label: 'Subjects', icon: 'book-open', route: '/subjects' },
     { label: 'Attendance', icon: 'check-square', route: '/attendance' },
     { label: 'Exams', icon: 'file-text', route: '/exams' },
+    { label: 'Exam Routine', icon: 'calendar', route: '/exams/routine' },
     { label: 'Class Routine', icon: 'clipboard', route: '/class-routine' },
     { label: 'Marks', icon: 'award', route: '/marks' },
     { label: 'Fees', icon: 'dollar-sign', route: '/fees' },

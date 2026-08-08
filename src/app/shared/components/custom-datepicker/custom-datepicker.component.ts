@@ -1,5 +1,5 @@
 import {
-  Component, Input, forwardRef, HostListener, ElementRef, OnInit, OnDestroy, ViewChild
+  Component, Input, forwardRef, ElementRef, OnInit, OnDestroy, ViewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -37,10 +37,19 @@ export class CustomDatepickerComponent implements ControlValueAccessor, OnInit, 
 
   constructor(private elRef: ElementRef) {}
 
-  ngOnInit() { this.buildCalendar(); }
+  private readonly boundOnOutsideClick = (e: MouseEvent) => this.onOutsideClick(e);
 
-  @HostListener('document:click', ['$event'])
+  ngOnInit() {
+    this.buildCalendar();
+    // Capture phase — see the identical fix/comment in SearchableSelectComponent. A
+    // `@HostListener('document:click')` (bubble phase) can be swallowed by any ancestor's
+    // `$event.stopPropagation()`, leaving the calendar stuck open; capture-phase runs before
+    // that's possible.
+    document.addEventListener('click', this.boundOnOutsideClick, true);
+  }
+
   onOutsideClick(e: MouseEvent) {
+    if (!this.isOpen) return;
     const target = e.target as Node;
     const insideHost = this.elRef.nativeElement.contains(target);
     const insidePanel = !!this.calendarPanelRef && this.calendarPanelRef.nativeElement.contains(target);
@@ -128,7 +137,10 @@ export class CustomDatepickerComponent implements ControlValueAccessor, OnInit, 
     this.detachRepositionListeners();
   }
 
-  ngOnDestroy(): void { this.detachRepositionListeners(); }
+  ngOnDestroy(): void {
+    this.detachRepositionListeners();
+    document.removeEventListener('click', this.boundOnOutsideClick, true);
+  }
 
   // Same fix as app-searchable-select: the calendar is `position: fixed` (so it can escape a
   // card's `overflow: hidden`) using a snapshot of the input's viewport-relative position taken

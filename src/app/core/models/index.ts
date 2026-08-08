@@ -284,6 +284,9 @@ export interface ExamRoutineRow {
   roomNote?: string;
   authStatus?: string;
   schoolEiin?: string;
+  /** Teachers assigned to invigilate this sitting. */
+  invigilatorTeacherIds?: number[];
+  invigilatorNames?: string[];
 }
 
 // ── Mark ──────────────────────────────────────────────────────────────────────

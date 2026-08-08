@@ -19,102 +19,126 @@
       <app-searchable-select
         [options]="examOptions"
         [disabled]="loadingOptions"
+        [ngModel]="selectedExamId"
         placeholder="Select an exam, e.g. Annual Exam"
-        (valueChange)="onExamSelect($event)">
+        (ngModelChange)="onExamSelect($any($event))">
       </app-searchable-select>
     </div>
 
     @if (!selectedExamId) {
-      <div class="text-center" style="padding:32px;color:var(--text-muted);">
-        Select an exam above to build or view its routine.
-      </div>
+      <div class="empty-hint">Select an exam above to build or view its routine.</div>
     } @else {
-      <div class="adjust-form" style="margin:16px 0;">
-        <div class="adjust-title">Add a routine slot</div>
-        <form [formGroup]="form" (ngSubmit)="addSlot()">
-          <div class="adjust-fields">
-            <div class="form-group">
-              <label>Class <span class="required">*</span></label>
-              <app-searchable-select [options]="classOptions" formControlName="classId" placeholder="Select Class"></app-searchable-select>
-            </div>
-            <div class="form-group">
-              <label>Subject <span class="required">*</span></label>
-              <app-searchable-select [options]="subjectOptions" formControlName="subjectId" placeholder="Select Subject"></app-searchable-select>
-            </div>
-            <div class="form-group">
-              <label>Date</label>
-              <app-custom-datepicker formControlName="examDate"></app-custom-datepicker>
-            </div>
-            <div class="form-group">
-              <label>Start Time</label>
-              <input type="time" class="form-control" formControlName="startTime" />
-            </div>
-            <div class="form-group">
-              <label>End Time</label>
-              <input type="time" class="form-control" formControlName="endTime" />
-            </div>
-            <div class="form-group">
-              <label>Room / Note</label>
-              <input type="text" class="form-control" formControlName="roomNote" placeholder="e.g. Room 12" />
-            </div>
-          </div>
-          <div class="adjust-actions">
-            <button type="submit" class="btn btn-primary" [disabled]="saving">
-              {{ saving ? 'Adding...' : '+ Add to Routine' }}
-            </button>
-          </div>
-        </form>
+      <div class="filter-bar">
+        <div class="form-group">
+          <label>Exam Date</label>
+          <app-custom-datepicker [(ngModel)]="newDate" placeholder="DD/MM/YYYY"></app-custom-datepicker>
+        </div>
+        <button type="button" class="btn btn-secondary" [disabled]="!newDate" (click)="addDate()">
+          + Add Date
+        </button>
+        <button type="button" class="btn btn-secondary" [disabled]="dates.length === 0 || removingDate" (click)="removeDate()">
+          {{ removingDate ? 'Removing...' : '- Remove Last Date' }}
+        </button>
       </div>
 
-      <div style="overflow-x:auto;">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Class</th>
-              <th>Subject</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Room / Note</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            @if (loadingRows) {
-              <tr><td colspan="6" class="text-center" style="padding:32px;color:var(--text-muted);">Loading...</td></tr>
-            } @else if (rows.length === 0) {
-              <tr><td colspan="6" class="text-center" style="padding:32px;color:var(--text-muted);">No routine slots yet — add one above.</td></tr>
-            } @else {
-              @for (row of rows; track row.examSubjectId) {
+      @if (loadingRoutine) {
+        <div class="form-loading">Loading routine...</div>
+      } @else if (dates.length === 0) {
+        <div class="empty-hint">Add an exam date above to start building the routine.</div>
+      } @else {
+        <div class="routine-scroll">
+          <table class="routine-table">
+            <thead>
+              <tr>
+                <th class="class-col">Class</th>
+                @for (date of dates; track date) {
+                  <th class="date-header">
+                    <div class="date-no">{{ dateHeading(date) }}</div>
+                    <div class="date-day">{{ dayHeading(date) }}</div>
+                    <input type="time" class="date-time-input"
+                      [ngModel]="dateTime(date).startTime"
+                      (ngModelChange)="onDateTimeChange(date, 'startTime', $event)" />
+                    <input type="time" class="date-time-input"
+                      [ngModel]="dateTime(date).endTime"
+                      (ngModelChange)="onDateTimeChange(date, 'endTime', $event)" />
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of classRows; track row.classId) {
                 <tr>
-                  <td>{{ row.className ?? '—' }}</td>
-                  <td>
-                    {{ row.subjectName ?? '—' }}
-                    @if (row.subjectCode) {
-                      <span style="color:var(--text-muted);font-size:12px;"> ({{ row.subjectCode }})</span>
-                    }
-                  </td>
-                  <td>{{ row.examDate ? (row.examDate | date:'dd MMM yyyy') : '—' }}</td>
-                  <td>
-                    @if (row.startTime && row.endTime) {
-                      {{ row.startTime }} - {{ row.endTime }}
-                    } @else if (row.startTime) {
-                      {{ row.startTime }}
-                    } @else {
-                      —
-                    }
-                  </td>
-                  <td>{{ row.roomNote ?? '—' }}</td>
-                  <td style="text-align:right;">
-                    <button type="button" class="btn-outline-light" style="padding:2px 10px;font-size:12px;" (click)="removeSlot(row)">
-                      <app-icon name="trash" [size]="12"></app-icon>
-                    </button>
-                  </td>
+                  <td class="class-col">{{ row.className }}</td>
+                  @for (date of dates; track date) {
+                    <td class="routine-cell" [class.saving]="cell(row.classId, date).saving"
+                      [class.filled]="cell(row.classId, date).subjectId" (click)="openCellEditor(row.classId, date)">
+                      @if (cell(row.classId, date).subjectId) {
+                        <div class="cell-subject">{{ subjectLabel(cell(row.classId, date).subjectId) }}</div>
+                        @if (cell(row.classId, date).roomNote) {
+                          <div class="cell-room">{{ cell(row.classId, date).roomNote }}</div>
+                        }
+                        @if (cell(row.classId, date).invigilatorTeacherIds.length) {
+                          <div class="cell-invigilators">{{ invigilatorNamesFor(cell(row.classId, date).invigilatorTeacherIds) }}</div>
+                        }
+                      } @else {
+                        <div class="cell-empty">+ Add</div>
+                      }
+                    </td>
+                  }
                 </tr>
               }
-            }
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (editingCell) {
+        <div class="cell-editor-backdrop" (click)="onBackdropClick($event)">
+          <div class="cell-editor">
+            <div class="cell-editor-header">
+              <span>{{ dateHeading(editingCell.date) }} &bull; {{ classNameFor(editingCell.classId) }}</span>
+              <button type="button" class="cell-editor-close" (click)="closeCellEditor()">&times;</button>
+            </div>
+            <div class="cell-editor-body">
+              <div class="form-group">
+                <label>Subject</label>
+                <app-searchable-select
+                  [options]="subjectOptions"
+                  [ngModel]="cell(editingCell.classId, editingCell.date).subjectId"
+                  (ngModelChange)="onSubjectChange(editingCell.classId, editingCell.date, $any($event))"
+                  placeholder="Subject"></app-searchable-select>
+              </div>
+              <div class="form-group">
+                <label>Room / Note</label>
+                <input type="text" class="form-control"
+                  [ngModel]="cell(editingCell.classId, editingCell.date).roomNote"
+                  (ngModelChange)="cell(editingCell.classId, editingCell.date).roomNote = $event"
+                  (blur)="onRoomNoteBlur(editingCell.classId, editingCell.date)"
+                  placeholder="e.g. Room 12" />
+              </div>
+              <div class="form-group">
+                <label>Invigilators</label>
+                <app-multi-select
+                  [options]="teacherOptions"
+                  [ngModel]="cell(editingCell.classId, editingCell.date).invigilatorTeacherIds"
+                  (ngModelChange)="onInvigilatorsChange(editingCell.classId, editingCell.date, $any($event))"
+                  [disabled]="!cell(editingCell.classId, editingCell.date).subjectId"
+                  placeholder="Select invigilating teacher(s)"></app-multi-select>
+                @if (!cell(editingCell.classId, editingCell.date).subjectId) {
+                  <div class="field-hint">Pick a subject first, then assign invigilators.</div>
+                }
+              </div>
+            </div>
+            <div class="cell-editor-footer">
+              @if (cell(editingCell.classId, editingCell.date).subjectId) {
+                <button type="button" class="btn btn-secondary cell-editor-clear"
+                  (click)="clearCell(editingCell.classId, editingCell.date); closeCellEditor()">Clear</button>
+              }
+              <button type="button" class="btn btn-primary" (click)="closeCellEditor()">Done</button>
+            </div>
+          </div>
+        </div>
+      }
     }
   </div>
 </div>
