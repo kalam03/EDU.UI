@@ -3,15 +3,50 @@
 .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
 .alert-danger { background: #fed7d7; color: #9b2335; }
 .required { color: var(--danger); }
+
+// Each section is a real <fieldset> so the title (<legend>) sits directly on top of the card's
+// own border line — like a classic form-section label cut into the border — instead of being a
+// separate banner row above/inside the box.
+.form-section {
+  border: 1.5px solid var(--border-strong);
+  border-radius: 10px;
+  margin: 0 0 22px;
+  padding: 0 16px 16px;
+  min-width: 0;
+}
 .section-title {
-  font-size: 15px;
+  padding: 0 8px;
+  margin: 0 0 0 8px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--primary);
-  margin: 24px 0 16px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--border);
-  &:first-of-type { margin-top: 0; }
+  background: #fff;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  border-bottom: none;
+  width: auto;
 }
+.section-body { padding-top: 10px; }
+
 .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; font-weight: 500; }
 .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
 textarea.form-control { resize: vertical; }
+
+// ── Photo upload cards: small, passport-photo-sized boxes (matching the admission form's
+// photo box) instead of a full-width 180px-tall strip, so any uploaded image — whatever its
+// original shape — sits in a compact, consistent card instead of a wide, easily-distorted one.
+.image-upload-card {
+  align-items: center;
+  text-align: center;
+}
+.image-upload-label {
+  color: var(--text);
+  font-weight: 700;
+}
+.image-preview-box {
+  width: 120px !important;
+  height: 148px !important;
+  margin: 0 auto;
+  border: 2px dashed var(--border-strong) !important;
+}
+.upload-placeholder { color: var(--text-muted); }

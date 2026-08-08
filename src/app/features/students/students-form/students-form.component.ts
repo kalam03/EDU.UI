@@ -81,7 +81,7 @@ export class StudentsFormComponent implements OnInit {
     motherName:       ['', Validators.required],
     dob:              ['', Validators.required],
     gender:           ['', Validators.required],
-    mobileNumber:     ['', Validators.pattern(/^[0-9+\-\s]{7,20}$/)],
+    mobileNumber:     ['', [Validators.pattern(/^[0-9]{7,11}$/), Validators.maxLength(11)]],
     email:            ['', Validators.email],
     address:          [''],
     classId:          [null as number | null, Validators.required],
@@ -89,7 +89,7 @@ export class StudentsFormComponent implements OnInit {
     groupId:          [null as number | null],
     enrollmentYear:   [String(new Date().getFullYear()), Validators.required],
     guardianName:     [''],
-    guardianContact:  ['', [Validators.required, Validators.pattern(/^[0-9+\-\s]{7,20}$/)]],
+    guardianContact:  ['', [Validators.required, Validators.pattern(/^[0-9]{7,11}$/), Validators.maxLength(11)]],
     guardianRelation: [''],
     guardianAddress:  [''],
     // Tuition fee is not editable here — it's assigned/adjusted from the Fee Management
