@@ -8,7 +8,7 @@ import { GroupService } from '../../core/services/group.service';
 import { SubjectService } from '../../core/services/subject.service';
 import { TeacherService } from '../../core/services/teacher.service';
 import { ClassRoutineService } from '../../core/services/class-routine.service';
-import { ClassRoutine, DAYS_OF_WEEK, TeacherSubjectAssignment } from '../../core/models';
+import { ClassRoutine, DAYS_OF_WEEK } from '../../core/models';
 import { SearchableSelectComponent, SelectOption } from '../../common/searchable-select/searchable-select.component';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 
@@ -47,6 +47,10 @@ export class ClassRoutineComponent implements OnInit {
   sectionOptions: SelectOption[] = [];
   groupOptions: SelectOption[] = [];
   subjectOptions: SelectOption[] = [];
+  /** Every teacher in the school, shown as-is in the Teacher dropdown — same as subjectOptions —
+   *  rather than filtered down to only teachers with a matching subject/class assignment, which
+   *  left the dropdown empty whenever assignment data wasn't set up for that combination. */
+  teacherOptions: SelectOption[] = [];
 
   selectedClassId: number | null = null;
   selectedSectionId: number | null = null;
@@ -57,7 +61,6 @@ export class ClassRoutineComponent implements OnInit {
   printingAll = false;
   error = '';
 
-  private allAssignments: TeacherSubjectAssignment[] = [];
   /** Keyed by `${day}_${period}`. */
   cells: Record<string, RoutineCell> = {};
   /** One start/end time per period, shared across all 7 days in that row — schools run the same
@@ -79,10 +82,13 @@ export class ClassRoutineComponent implements OnInit {
     this.subjectService.list().subscribe(s => {
       this.subjectOptions = s.map(x => ({ value: x.subjectId, label: x.subjectName }));
     });
-    this.teacherService.getAllAssignments().subscribe(a => this.allAssignments = a);
     this.teacherService.list().subscribe(t => {
       this.teacherNames = {};
-      for (const x of t) this.teacherNames[x.teacherId] = `${x.firstName} ${x.lastName ?? ''}`.trim();
+      this.teacherOptions = t.map(x => {
+        const name = `${x.firstName} ${x.lastName ?? ''}`.trim();
+        this.teacherNames[x.teacherId] = name;
+        return { value: x.teacherId, label: name };
+      });
     });
   }
 
@@ -240,19 +246,6 @@ export class ClassRoutineComponent implements OnInit {
       },
       error: () => { this.loading = false; this.error = 'Failed to load routine.'; }
     });
-  }
-
-  /** Teachers eligible for this cell's currently-chosen subject, filtered to the selected
-   *  class/section/group — an assignment with a blank section/group means "any section/group". */
-  eligibleTeachers(day: string, period: number): SelectOption[] {
-    const c = this.cell(day, period);
-    if (!c.subjectId || !this.selectedClassId) return [];
-    return this.allAssignments
-      .filter(a => a.subjectId === c.subjectId
-        && a.classId === this.selectedClassId
-        && (a.sectionId == null || a.sectionId === this.selectedSectionId)
-        && (a.groupId == null || a.groupId === this.selectedGroupId))
-      .map(a => ({ value: a.teacherId, label: a.teacherName ?? `Teacher #${a.teacherId}` }));
   }
 
   onSubjectChange(day: string, period: number, subjectId: number | null): void {

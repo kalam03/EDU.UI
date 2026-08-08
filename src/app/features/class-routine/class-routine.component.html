@@ -104,7 +104,7 @@
             <div class="form-group">
               <label>Teacher</label>
               <app-searchable-select
-                [options]="eligibleTeachers(editingCell.day, editingCell.period)"
+                [options]="teacherOptions"
                 [ngModel]="cell(editingCell.day, editingCell.period).teacherId"
                 (ngModelChange)="onTeacherChange(editingCell.day, editingCell.period, $any($event))"
                 [disabled]="!cell(editingCell.day, editingCell.period).subjectId"
