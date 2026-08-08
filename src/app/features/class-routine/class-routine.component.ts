@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { forkJoin, of, Observable } from 'rxjs';
 import { ClassService } from '../../core/services/class.service';
 import { SectionService } from '../../core/services/section.service';
@@ -250,15 +251,20 @@ export class ClassRoutineComponent implements OnInit {
 
   onSubjectChange(day: string, period: number, subjectId: number | null): void {
     const c = this.cell(day, period);
+    const prevSubjectId = c.subjectId;
+    const prevTeacherId = c.teacherId;
     c.subjectId = subjectId;
     c.teacherId = null;
-    this.saveCell(day, period);
+    // On failure (e.g. a teacher-conflict rejection from the server), undo the optimistic change
+    // so the popup doesn't keep showing a selection that was never actually saved.
+    this.saveCell(day, period, () => { c.subjectId = prevSubjectId; c.teacherId = prevTeacherId; });
   }
 
   onTeacherChange(day: string, period: number, teacherId: number | null): void {
     const c = this.cell(day, period);
+    const prevTeacherId = c.teacherId;
     c.teacherId = teacherId;
-    this.saveCell(day, period);
+    this.saveCell(day, period, () => { c.teacherId = prevTeacherId; });
   }
 
   /** Setting a period's time applies to every day already using that period — re-saves each
@@ -283,8 +289,11 @@ export class ClassRoutineComponent implements OnInit {
   }
 
   /** Auto-saves a cell the moment its subject/teacher changes — no separate "Save" button per
-   *  slot, since a weekly grid with 40+ cells makes per-cell save buttons tedious to click through. */
-  private saveCell(day: string, period: number): void {
+   *  slot, since a weekly grid with 40+ cells makes per-cell save buttons tedious to click through.
+   *  `onFailure`, if given, undoes the optimistic UI change already applied by the caller — used so
+   *  a rejected save (e.g. the teacher is already booked elsewhere at this time) doesn't leave the
+   *  popup showing a selection that was never actually persisted. */
+  private saveCell(day: string, period: number, onFailure?: () => void): void {
     if (!this.selectedClassId) return;
     const c = this.cell(day, period);
     if (!c.subjectId) {
@@ -318,7 +327,13 @@ export class ClassRoutineComponent implements OnInit {
         c.saving = false;
         if (!c.classRoutineId && res.data) c.classRoutineId = (res.data as ClassRoutine).classRoutineId;
       },
-      error: () => { c.saving = false; this.error = 'Failed to save slot.'; }
+      error: (err: HttpErrorResponse) => {
+        c.saving = false;
+        // The backend sends a specific reason (e.g. a teacher double-booking conflict) as
+        // `message` on a 400 response — show that instead of a generic failure text.
+        this.error = err?.error?.message || 'Failed to save slot.';
+        if (onFailure) onFailure();
+      }
     });
   }
 
