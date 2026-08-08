@@ -11,6 +11,7 @@ import { GroupService } from '../../../core/services/group.service';
 import { SearchableSelectComponent, SelectOption } from '../../../common/searchable-select/searchable-select.component';
 import { EditableDatepickerComponent } from '../../../common/editable-datepicker/editable-datepicker.component';
 import { environment } from '../../../../environments/environment';
+import { Religion } from '../../../core/models';
 
 @Component({
   selector: 'app-students-form',
@@ -62,6 +63,7 @@ export class StudentsFormComponent implements OnInit {
     { value: 'Female', label: 'Female' },
     { value: 'Other',  label: 'Other' }
   ];
+  religionOptions: SelectOption[] = Object.values(Religion).map(r => ({ value: r, label: r }));
   // Covers a reasonable admission window: 5 years back through 1 year ahead of today,
   // newest first so the current year is easy to find at the top of the list.
   // Values are strings to match EnrollmentYear's NVARCHAR storage on the backend —

@@ -114,6 +114,16 @@ export interface Staff {
 }
 
 // ── Student ───────────────────────────────────────────────────────────────────
+// Fixed set of options for the Religion dropdown — kept as an enum (rather than free text)
+// so values are consistent for reporting/filtering; stored on the backend as the plain string.
+export enum Religion {
+  Islam = 'Islam',
+  Hinduism = 'Hinduism',
+  Christianity = 'Christianity',
+  Buddhism = 'Buddhism',
+  Other = 'Other'
+}
+
 export interface Student {
   studentId: number;
   userId?: number;
