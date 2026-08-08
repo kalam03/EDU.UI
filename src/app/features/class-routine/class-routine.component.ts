@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin, of, Observable } from 'rxjs';
 import { ClassService } from '../../core/services/class.service';
 import { SectionService } from '../../core/services/section.service';
 import { GroupService } from '../../core/services/group.service';
@@ -53,6 +54,7 @@ export class ClassRoutineComponent implements OnInit {
 
   loading = false;
   printing = false;
+  printingAll = false;
   error = '';
 
   private allAssignments: TeacherSubjectAssignment[] = [];
@@ -61,6 +63,14 @@ export class ClassRoutineComponent implements OnInit {
   /** One start/end time per period, shared across all 7 days in that row — schools run the same
    *  period-time slots every day, so the time is set once per row rather than per cell. */
   periodTimes: Record<number, PeriodTime> = {};
+  /** teacherId -> display name, for rendering the compact grid cell without depending on the
+   *  subject-filtered `eligibleTeachers()` list (which may not include an already-saved teacher
+   *  once the subject/class filters change). */
+  private teacherNames: Record<number, string> = {};
+
+  /** The cell currently open in the edit popup — grid cells only show short text; editing the
+   *  subject/teacher happens in this popup so the table stays narrow with many periods/subjects. */
+  editingCell: { day: string; period: number } | null = null;
 
   ngOnInit(): void {
     this.classService.list().subscribe(c => {
@@ -70,6 +80,29 @@ export class ClassRoutineComponent implements OnInit {
       this.subjectOptions = s.map(x => ({ value: x.subjectId, label: x.subjectName }));
     });
     this.teacherService.getAllAssignments().subscribe(a => this.allAssignments = a);
+    this.teacherService.list().subscribe(t => {
+      this.teacherNames = {};
+      for (const x of t) this.teacherNames[x.teacherId] = `${x.firstName} ${x.lastName ?? ''}`.trim();
+    });
+  }
+
+  subjectLabel(subjectId: number | null): string {
+    if (!subjectId) return '';
+    return this.subjectOptions.find(o => o.value === subjectId)?.label ?? `#${subjectId}`;
+  }
+
+  teacherLabelFor(teacherId: number | null): string {
+    if (!teacherId) return '';
+    return this.teacherNames[teacherId] ?? `#${teacherId}`;
+  }
+
+  openCellEditor(day: string, period: number): void {
+    if (this.cell(day, period).saving) return;
+    this.editingCell = { day, period };
+  }
+
+  closeCellEditor(): void {
+    this.editingCell = null;
   }
 
   onClassChange(classId: number | null): void {
@@ -93,8 +126,40 @@ export class ClassRoutineComponent implements OnInit {
     this.loadRoutine();
   }
 
+  removingPeriod = false;
+
   addPeriod(): void {
     this.periods = [...this.periods, this.periods.length ? this.periods[this.periods.length - 1] + 1 : 1];
+  }
+
+  /** Drops the last period column — deletes any saved slots in that period first (across every
+   *  day), then removes the column locally once the server confirms. */
+  removePeriod(): void {
+    if (this.periods.length <= 1 || this.removingPeriod) return;
+    const lastPeriod = this.periods[this.periods.length - 1];
+    const idsToDelete = this.days
+      .map(day => this.cell(day, lastPeriod).classRoutineId)
+      .filter((id): id is number => id != null);
+
+    this.removingPeriod = true;
+    this.error = '';
+    // Explicitly typed as Observable<unknown> — without this, TS infers a union of two
+    // differently-shaped Observable types (forkJoin's vs of(null)'s), and calling .subscribe()
+    // on that union trips TS2349 ("not callable") because the two subscribe() overload sets
+    // aren't compatible with each other.
+    const done$: Observable<unknown> = idsToDelete.length
+      ? forkJoin(idsToDelete.map(id => this.routineService.delete(id)))
+      : of(null);
+
+    done$.subscribe({
+      next: () => {
+        for (const day of this.days) delete this.cells[this.key(day, lastPeriod)];
+        delete this.periodTimes[lastPeriod];
+        this.periods = this.periods.slice(0, -1);
+        this.removingPeriod = false;
+      },
+      error: () => { this.error = 'Failed to remove period.'; this.removingPeriod = false; }
+    });
   }
 
   private resetGrid(): void {
@@ -268,6 +333,22 @@ export class ClassRoutineComponent implements OnInit {
         this.printing = false;
       },
       error: () => { this.error = 'Failed to generate the routine PDF.'; this.printing = false; }
+    });
+  }
+
+  /** Downloads every class's routine as one combined PDF (one page per class/section/group) —
+   *  for printing the whole school's timetable in a single go instead of one class at a time. */
+  printAllRoutines(): void {
+    this.printingAll = true;
+    this.error = '';
+    this.routineService.downloadAllPdf().subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        this.printingAll = false;
+      },
+      error: () => { this.error = 'Failed to generate the combined routine PDF.'; this.printingAll = false; }
     });
   }
 }

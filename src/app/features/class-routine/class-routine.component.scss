@@ -15,7 +15,6 @@
 .routine-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 900px;
 
   th, td {
     border: 1px solid var(--border);
@@ -33,15 +32,18 @@
     padding: 10px 8px;
   }
 
-  .period-col {
+  .day-col {
     width: 110px;
     text-align: center;
     font-weight: 700;
     color: var(--text);
     background: #f8fafc;
   }
+
+  thead .day-col { color: #fff; background: var(--primary); }
 }
 
+.period-header { min-width: 100px; max-width: 130px; }
 .period-no { margin-bottom: 6px; }
 .period-time-input {
   width: 100%;
@@ -55,24 +57,111 @@
   &:focus { outline: none; border-color: var(--accent); }
 }
 
-.routine-cell {
-  min-width: 150px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  position: relative;
-  transition: opacity 0.15s;
-  &.saving { opacity: 0.55; pointer-events: none; }
+.off-day-row .day-col { background: #f8fafc; }
+.off-day-cell {
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: repeating-linear-gradient(45deg, #f8fafc, #f8fafc 10px, #f1f5f9 10px, #f1f5f9 20px);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 12px;
 }
 
-.clear-cell-btn {
-  align-self: flex-end;
+.routine-cell {
+  min-width: 96px;
+  max-width: 130px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  &.saving { opacity: 0.55; pointer-events: none; }
+  &:hover { background: #f8fafc; }
+  &.filled:hover { background: #eef4ff; }
+}
+
+.cell-subject {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-teacher {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-empty {
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.routine-cell:hover .cell-empty { opacity: 1; }
+
+// ─── cell editor popup ──────────────────────────────────────────────────
+.cell-editor-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.cell-editor {
+  background: #fff;
+  border-radius: 12px;
+  width: 320px;
+  max-width: 92vw;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.cell-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13.5px;
+}
+
+.cell-editor-close {
   background: none;
   border: none;
-  color: var(--danger);
-  font-size: 11px;
-  font-weight: 600;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
   cursor: pointer;
-  padding: 2px 4px;
-  &:hover { text-decoration: underline; }
+  padding: 0 4px;
+}
+
+.cell-editor-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cell-editor-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.cell-editor-clear {
+  margin-right: auto;
+  color: var(--danger);
 }

@@ -26,4 +26,9 @@ export class ClassRoutineService extends BaseApiService<ClassRoutine> {
     if (groupId != null) url += `&groupId=${groupId}`;
     return this.http2.get(url, { responseType: 'blob' });
   }
+
+  /** Every class/section/group's routine as one PDF (one page per class). */
+  downloadAllPdf(): Observable<Blob> {
+    return this.http2.get(`${environment.apiUrl}/classroutines/pdf/all`, { responseType: 'blob' });
+  }
 }

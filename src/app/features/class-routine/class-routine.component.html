@@ -24,8 +24,15 @@
       <button type="button" class="btn btn-secondary" [disabled]="!selectedClassId" (click)="addPeriod()">
         + Add Period
       </button>
+      <button type="button" class="btn btn-secondary" [disabled]="!selectedClassId || periods.length <= 1 || removingPeriod"
+        (click)="removePeriod()">
+        {{ removingPeriod ? 'Removing...' : '- Remove Period' }}
+      </button>
       <button type="button" class="btn btn-primary" [disabled]="!selectedClassId || printing" (click)="printRoutine()">
         <app-icon name="printer" [size]="14"></app-icon> {{ printing ? 'Preparing...' : 'Print Routine' }}
+      </button>
+      <button type="button" class="btn btn-secondary" [disabled]="printingAll" (click)="printAllRoutines()">
+        <app-icon name="printer" [size]="14"></app-icon> {{ printingAll ? 'Preparing...' : 'Print All Classes' }}
       </button>
     </div>
 
@@ -38,16 +45,9 @@
         <table class="routine-table">
           <thead>
             <tr>
-              <th class="period-col">Period</th>
-              @for (day of days; track day) {
-                <th>{{ day }}</th>
-              }
-            </tr>
-          </thead>
-          <tbody>
-            @for (period of periods; track period) {
-              <tr>
-                <td class="period-col">
+              <th class="day-col">Day</th>
+              @for (period of periods; track period) {
+                <th class="period-header">
                   <div class="period-no">Period {{ period }}</div>
                   <input type="time" class="period-time-input"
                     [ngModel]="periodTime(period).startTime"
@@ -55,29 +55,70 @@
                   <input type="time" class="period-time-input"
                     [ngModel]="periodTime(period).endTime"
                     (ngModelChange)="onPeriodTimeChange(period, 'endTime', $event)" />
-                </td>
-                @for (day of days; track day) {
-                  <td class="routine-cell" [class.saving]="cell(day, period).saving">
-                    <app-searchable-select
-                      [options]="subjectOptions"
-                      [ngModel]="cell(day, period).subjectId"
-                      (ngModelChange)="onSubjectChange(day, period, $any($event))"
-                      placeholder="Subject"></app-searchable-select>
-                    <app-searchable-select
-                      [options]="eligibleTeachers(day, period)"
-                      [ngModel]="cell(day, period).teacherId"
-                      (ngModelChange)="onTeacherChange(day, period, $any($event))"
-                      [disabled]="!cell(day, period).subjectId"
-                      placeholder="Teacher"></app-searchable-select>
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (day of days; track day) {
+              <tr>
+                <td class="day-col">{{ day }}</td>
+                @for (period of periods; track period) {
+                  <td class="routine-cell" [class.saving]="cell(day, period).saving"
+                    [class.filled]="cell(day, period).subjectId" (click)="openCellEditor(day, period)">
                     @if (cell(day, period).subjectId) {
-                      <button type="button" class="clear-cell-btn" (click)="clearCell(day, period)">Clear</button>
+                      <div class="cell-subject">{{ subjectLabel(cell(day, period).subjectId) }}</div>
+                      <div class="cell-teacher">{{ cell(day, period).teacherId ? teacherLabelFor(cell(day, period).teacherId) : '—' }}</div>
+                    } @else {
+                      <div class="cell-empty">+ Add</div>
                     }
                   </td>
                 }
               </tr>
             }
+            <tr class="off-day-row">
+              <td class="day-col">Friday</td>
+              <td [attr.colspan]="periods.length" class="off-day-cell">Weekly Off</td>
+            </tr>
           </tbody>
         </table>
+      </div>
+    }
+
+    @if (editingCell) {
+      <div class="cell-editor-backdrop" (click)="closeCellEditor()">
+        <div class="cell-editor" (click)="$event.stopPropagation()">
+          <div class="cell-editor-header">
+            <span>{{ editingCell.day }} &bull; Period {{ editingCell.period }}</span>
+            <button type="button" class="cell-editor-close" (click)="closeCellEditor()">&times;</button>
+          </div>
+          <div class="cell-editor-body">
+            <div class="form-group">
+              <label>Subject</label>
+              <app-searchable-select
+                [options]="subjectOptions"
+                [ngModel]="cell(editingCell.day, editingCell.period).subjectId"
+                (ngModelChange)="onSubjectChange(editingCell.day, editingCell.period, $any($event))"
+                placeholder="Subject"></app-searchable-select>
+            </div>
+            <div class="form-group">
+              <label>Teacher</label>
+              <app-searchable-select
+                [options]="eligibleTeachers(editingCell.day, editingCell.period)"
+                [ngModel]="cell(editingCell.day, editingCell.period).teacherId"
+                (ngModelChange)="onTeacherChange(editingCell.day, editingCell.period, $any($event))"
+                [disabled]="!cell(editingCell.day, editingCell.period).subjectId"
+                placeholder="Teacher"></app-searchable-select>
+            </div>
+          </div>
+          <div class="cell-editor-footer">
+            @if (cell(editingCell.day, editingCell.period).subjectId) {
+              <button type="button" class="btn btn-secondary cell-editor-clear"
+                (click)="clearCell(editingCell.day, editingCell.period); closeCellEditor()">Clear</button>
+            }
+            <button type="button" class="btn btn-primary" (click)="closeCellEditor()">Done</button>
+          </div>
+        </div>
       </div>
     }
   </div>

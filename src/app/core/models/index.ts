@@ -208,7 +208,9 @@ export interface TeacherSubjectAssignment {
 }
 
 // ── Class Routine ─────────────────────────────────────────────────────────────
-export const DAYS_OF_WEEK = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] as const;
+// Friday is the weekly off day (standard Bangladeshi school week), so it's excluded from the
+// working days the routine builder/print show — Saturday through Thursday only.
+export const DAYS_OF_WEEK = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'] as const;
 
 export interface ClassRoutine {
   classRoutineId: number;
