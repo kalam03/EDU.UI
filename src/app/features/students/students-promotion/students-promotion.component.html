@@ -1,0 +1,91 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Student Promotion</span>
+    <a routerLink="/students" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back to Students</a>
+  </div>
+
+  <div class="panel-body">
+    @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+    @if (successMessage) { <div class="alert alert-success">{{ successMessage }}</div> }
+
+    <div class="promo-section">
+      <div class="promo-section-title">1. Select students to promote</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>From Class <span class="required">*</span></label>
+          <app-searchable-select [options]="classOptions" placeholder="Select Class" (valueChange)="onFromClassSelect($any($event))"></app-searchable-select>
+        </div>
+        <div class="form-group">
+          <label>From Section</label>
+          <app-searchable-select [options]="fromSectionOptions" placeholder="All Sections" (valueChange)="onFromSectionSelect($any($event))"></app-searchable-select>
+        </div>
+      </div>
+
+      @if (fromClassId) {
+        <div style="overflow-x:auto;margin-top:12px;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width:36px;"><input type="checkbox" [checked]="allSelected" (change)="toggleAll()" /></th>
+                <th>Admission No</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Mobile</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (studentsLoading) {
+                <tr><td colspan="5" class="text-center" style="padding:24px;color:var(--text-muted);">Loading...</td></tr>
+              } @else if (students.length === 0) {
+                <tr><td colspan="5" class="text-center" style="padding:24px;color:var(--text-muted);">No students found in this class/section.</td></tr>
+              } @else {
+                @for (s of students; track s.studentId) {
+                  <tr (click)="toggleOne(s.studentId)" style="cursor:pointer;">
+                    <td (click)="$event.stopPropagation()"><input type="checkbox" [checked]="selected.has(s.studentId)" (change)="toggleOne(s.studentId)" /></td>
+                    <td>{{ s.admissionNo }}</td>
+                    <td>{{ s.firstName }} {{ s.lastName ?? '' }}</td>
+                    <td>{{ s.gender ?? '—' }}</td>
+                    <td>{{ s.mobileNumber ?? '—' }}</td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="promo-count">{{ selectedCount }} of {{ students.length }} selected</div>
+      }
+    </div>
+
+    @if (fromClassId) {
+      <div class="promo-section">
+        <div class="promo-section-title">2. Promote to</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>To Class <span class="required">*</span></label>
+            <app-searchable-select [options]="classOptions" placeholder="Select Class" (valueChange)="onToClassSelect($any($event))"></app-searchable-select>
+          </div>
+          <div class="form-group">
+            <label>To Section</label>
+            <app-searchable-select [options]="toSectionOptions" placeholder="Select Section" (valueChange)="onToSectionSelect($any($event))"></app-searchable-select>
+          </div>
+          <div class="form-group">
+            <label>To Group</label>
+            <app-searchable-select [options]="groupOptions" placeholder="Select Group" (valueChange)="onToGroupSelect($any($event))"></app-searchable-select>
+          </div>
+        </div>
+        <div class="form-group" style="max-width:220px;">
+          <label>New Enrollment Year</label>
+          <input type="text" class="form-control" [(ngModel)]="enrollmentYear" placeholder="e.g. 2027" />
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (fromClassId) {
+    <div class="panel-footer">
+      <button type="button" class="btn btn-primary" [disabled]="saving || selectedCount === 0" (click)="confirmPromote()">
+        {{ saving ? 'Promoting...' : 'Promote ' + selectedCount + ' Student' + (selectedCount === 1 ? '' : 's') }}
+      </button>
+    </div>
+  }
+</div>

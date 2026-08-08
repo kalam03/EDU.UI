@@ -1,14 +1,19 @@
 <div class="panel">
   <div class="panel-header">
     <span class="panel-title">Students</span>
-    <a routerLink="/students/new" class="btn-outline-light">+ Add Student</a>
+    <div class="d-flex gap-2">
+      <a routerLink="/students/promotion" class="btn-outline-light">Promotion</a>
+      <a routerLink="/students/new" class="btn-outline-light">+ Add Student</a>
+    </div>
   </div>
   <div class="panel-body">
     <app-data-table
       [columns]="columns"
       [data]="$any(students)"
       [loading]="loading"
+      [showView]="true"
       searchPlaceholder="Search by name, admission no..."
+      (view)="onView($event)"
       (edit)="onEdit($event)"
       (delete)="onDelete($event)"
     />

@@ -323,6 +323,19 @@ export interface CreateFeeAdjustment {
   remarks?: string;
 }
 
+// ── Student Promotion ────────────────────────────────────────────────────────
+export interface PromoteStudentsRequest {
+  studentIds: number[];
+  toClassId: number;
+  toSectionId?: number | null;
+  toGroupId?: number | null;
+  enrollmentYear?: string;
+}
+
+export interface PromoteStudentsResult {
+  promotedCount: number;
+}
+
 // ── Library: Book ─────────────────────────────────────────────────────────────
 export interface LibraryBook {
   bookId: number;

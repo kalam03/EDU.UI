@@ -1,5 +1,5 @@
 import {
-  Component, Input, forwardRef, HostListener, ElementRef, OnInit, ViewChild
+  Component, Input, forwardRef, HostListener, ElementRef, OnInit, OnDestroy, ViewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -12,11 +12,12 @@ import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/f
   styleUrl: './editable-datepicker.component.scss',
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => EditableDatepickerComponent), multi: true }]
 })
-export class EditableDatepickerComponent implements ControlValueAccessor, OnInit {
+export class EditableDatepickerComponent implements ControlValueAccessor, OnInit, OnDestroy {
   @Input() placeholder = 'DD/MM/YYYY';
   @Input() disabled = false;
 
   @ViewChild('inputRow', { static: false }) inputRowRef!: ElementRef;
+  @ViewChild('calendarPanel') calendarPanelRef?: ElementRef<HTMLElement>;
 
   isOpen = false;
   calTop = 0;
@@ -40,7 +41,10 @@ export class EditableDatepickerComponent implements ControlValueAccessor, OnInit
 
   @HostListener('document:click', ['$event'])
   onOutsideClick(e: MouseEvent) {
-    if (!this.elRef.nativeElement.contains(e.target)) this.isOpen = false;
+    const target = e.target as Node;
+    const insideHost = this.elRef.nativeElement.contains(target);
+    const insidePanel = !!this.calendarPanelRef && this.calendarPanelRef.nativeElement.contains(target);
+    if (!insideHost && !insidePanel) this.close();
   }
 
   onInputChange(raw: string): void {
@@ -102,12 +106,46 @@ export class EditableDatepickerComponent implements ControlValueAccessor, OnInit
   openCalendar(e: MouseEvent): void {
     e.stopPropagation();
     if (this.disabled) return;
+    this.updatePosition();
+    this.isOpen = true;
+    this.buildCalendar();
+    this.attachRepositionListeners();
+    setTimeout(() => this.portalToBody());
+  }
+
+  close(): void {
+    this.isOpen = false;
+    this.detachRepositionListeners();
+  }
+
+  ngOnDestroy(): void { this.detachRepositionListeners(); }
+
+  private updatePosition = (): void => {
+    if (!this.inputRowRef) return;
     const rect = this.inputRowRef.nativeElement.getBoundingClientRect();
     this.calTop = rect.bottom + 4;
     this.calLeft = rect.left;
     this.calWidth = Math.max(rect.width, 272);
-    this.isOpen = true;
-    this.buildCalendar();
+  };
+
+  private attachRepositionListeners(): void {
+    window.addEventListener('scroll', this.updatePosition, true);
+    window.addEventListener('resize', this.updatePosition);
+  }
+
+  private detachRepositionListeners(): void {
+    window.removeEventListener('scroll', this.updatePosition, true);
+    window.removeEventListener('resize', this.updatePosition);
+  }
+
+  // Same technique as app-searchable-select: reparent the panel to <body> once it exists so no
+  // ancestor in the form can trap or visually interfere with its position:fixed rendering.
+  private portalToBody(): void {
+    const panel = this.calendarPanelRef?.nativeElement;
+    if (panel && panel.parentElement !== document.body) {
+      document.body.appendChild(panel);
+      this.updatePosition();
+    }
   }
 
   buildCalendar() {
@@ -136,7 +174,7 @@ export class EditableDatepickerComponent implements ControlValueAccessor, OnInit
     this.inputValue = this.formatDay(day);
     this.onChange(this.toISO(day));
     this.onTouched();
-    this.isOpen = false;
+    this.close();
   }
 
   selectToday() { this.selectDay(new Date()); }

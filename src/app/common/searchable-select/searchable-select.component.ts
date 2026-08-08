@@ -1,5 +1,5 @@
 import {
-  Component, Input, Output, EventEmitter, OnInit, OnChanges,
+  Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy,
   SimpleChanges, forwardRef, HostListener, ElementRef, ViewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -22,13 +22,14 @@ export interface SelectOption {
     multi: true
   }]
 })
-export class SearchableSelectComponent implements ControlValueAccessor, OnInit, OnChanges {
+export class SearchableSelectComponent implements ControlValueAccessor, OnInit, OnChanges, OnDestroy {
   @Input() options: SelectOption[] = [];
   @Input() placeholder = 'Select...';
   @Input() disabled = false;
   @Output() valueChange = new EventEmitter<number | string | null>();
 
   @ViewChild('trigger', { static: false }) triggerRef!: ElementRef;
+  @ViewChild('dropdownPanel') dropdownPanelRef?: ElementRef<HTMLElement>;
 
   isOpen = false;
   dropTop = 0;
@@ -46,7 +47,13 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
 
   @HostListener('document:click', ['$event'])
   onOutside(e: MouseEvent) {
-    if (!this.elRef.nativeElement.contains(e.target)) this.close();
+    const target = e.target as Node;
+    const insideHost = this.elRef.nativeElement.contains(target);
+    // The panel is portaled to <body> once open (see portalToBody), so it's no longer a
+    // descendant of elRef.nativeElement. Without this extra check, every click inside the
+    // panel (a search keystroke, an option row) would look like an "outside" click and close it.
+    const insideDropdown = !!this.dropdownPanelRef && this.dropdownPanelRef.nativeElement.contains(target);
+    if (!insideHost && !insideDropdown) this.close();
   }
 
   ngOnInit() { this.filteredOptions = [...this.options]; }
@@ -64,17 +71,68 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
   toggleDropdown() {
     if (this.disabled) return;
     if (!this.isOpen) {
-      const rect = this.triggerRef.nativeElement.getBoundingClientRect();
-      this.dropTop = rect.bottom + 2;
-      this.dropLeft = rect.left;
-      this.dropWidth = rect.width;
+      this.updatePosition();
       this.searchQuery = '';
       this.filteredOptions = [...this.options];
+      this.isOpen = true;
+      this.attachRepositionListeners();
+      // Wait a tick for *ngIf to create the panel's DOM node, then move it to <body>.
+      setTimeout(() => this.portalToBody());
+    } else {
+      this.close();
     }
-    this.isOpen = !this.isOpen;
   }
 
-  close() { this.isOpen = false; this.searchQuery = ''; this.filteredOptions = [...this.options]; }
+  // Moves the dropdown panel out of the form's DOM tree and appends it directly to <body>.
+  // The panel is `position: fixed`, so an ancestor further up the form (a card, a section
+  // wrapper, anything establishing its own stacking context or a containing block for fixed
+  // elements) can otherwise trap it, causing it to render underneath or bleed together with
+  // sibling content instead of floating cleanly on top of the whole page. Reparenting to <body>
+  // removes every such ancestor from the equation. Angular's change detection and event bindings
+  // keep working normally on the moved node; when *ngIf later destroys it, Angular removes it
+  // from wherever it currently lives (its actual live parent), so no manual cleanup is needed.
+  private portalToBody(): void {
+    const panel = this.dropdownPanelRef?.nativeElement;
+    if (panel && panel.parentElement !== document.body) {
+      document.body.appendChild(panel);
+      this.updatePosition();
+    }
+  }
+
+  close() {
+    this.isOpen = false;
+    this.searchQuery = '';
+    this.filteredOptions = [...this.options];
+    this.detachRepositionListeners();
+  }
+
+  ngOnDestroy(): void { this.detachRepositionListeners(); }
+
+  /// The dropdown panel is `position: fixed` (so it can escape any card's `overflow: hidden`
+  /// without being clipped), positioned from the trigger's viewport-relative coordinates. Those
+  /// coordinates are only a snapshot from the moment it opened — without this, scrolling the page
+  /// (or any scrollable container the trigger sits in) moves the trigger out from under a dropdown
+  /// that stays frozen at its original spot. `updatePosition` re-reads the trigger's live position
+  /// on every scroll/resize while the dropdown is open so it always stays glued to the control.
+  private updatePosition = (): void => {
+    if (!this.triggerRef) return;
+    const rect = this.triggerRef.nativeElement.getBoundingClientRect();
+    this.dropTop = rect.bottom + 2;
+    this.dropLeft = rect.left;
+    this.dropWidth = rect.width;
+  };
+
+  private attachRepositionListeners(): void {
+    // capture: true so this also fires for scroll events on any scrollable ancestor (a table
+    // wrapper, a modal body, etc.), not just the window itself.
+    window.addEventListener('scroll', this.updatePosition, true);
+    window.addEventListener('resize', this.updatePosition);
+  }
+
+  private detachRepositionListeners(): void {
+    window.removeEventListener('scroll', this.updatePosition, true);
+    window.removeEventListener('resize', this.updatePosition);
+  }
 
   onSearch() {
     const q = this.searchQuery.toLowerCase();
@@ -108,7 +166,10 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
   onKeyDown(e: KeyboardEvent) {
     if (!this.isOpen) {
       if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
-        this.isOpen = true; e.preventDefault();
+        // Route through toggleDropdown() rather than setting isOpen directly, so the keyboard-
+        // opened dropdown gets positioned and kept in sync on scroll just like a mouse click does.
+        this.toggleDropdown();
+        e.preventDefault();
       }
       return;
     }

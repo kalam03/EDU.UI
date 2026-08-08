@@ -1,0 +1,123 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Student Details</span>
+    <div class="d-flex gap-2">
+      @if (student) {
+        <a [routerLink]="['/students', student.studentId, 'edit']" class="btn-outline-light">Edit</a>
+        <button type="button" class="btn-outline-light" (click)="onDelete()">Delete</button>
+      }
+      <a routerLink="/students" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back to List</a>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    @if (loading) {
+      <div class="form-loading">Loading...</div>
+    } @else if (error) {
+      <div class="alert alert-danger">{{ error }}</div>
+    } @else if (student) {
+      <div class="detail-header">
+        <div class="detail-photo">
+          @if (studentImageUrl) {
+            <img [src]="studentImageUrl" alt="Student photo" />
+          } @else {
+            <div class="detail-photo-placeholder"><app-icon name="user" [size]="32"></app-icon></div>
+          }
+        </div>
+        <div class="detail-identity">
+          <div class="detail-name">{{ student.firstName }} {{ student.lastName ?? '' }}</div>
+          <div class="detail-sub">
+            Admission No: <strong>{{ student.admissionNo }}</strong>
+            <span class="badge" [ngClass]="student.authStatus === 'A' ? 'badge-success' : 'badge-warning'" style="margin-left:10px;">
+              {{ student.authStatus === 'A' ? 'Active' : (student.authStatus === 'D' ? 'Deleted' : 'Pending') }}
+            </span>
+          </div>
+          <div class="detail-sub">{{ className }} @if (sectionName !== '—') { — {{ sectionName }} } @if (groupName !== '—') { ({{ groupName }}) }</div>
+          <div class="detail-sub">Enrollment Year: {{ student.enrollmentYear ?? '—' }}</div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Personal Information</div>
+        <div class="detail-grid">
+          <div><span class="detail-label">Father's Name</span><span class="detail-value">{{ student.fatherName ?? '—' }}</span></div>
+          <div><span class="detail-label">Mother's Name</span><span class="detail-value">{{ student.motherName ?? '—' }}</span></div>
+          <div><span class="detail-label">Date of Birth</span><span class="detail-value">{{ student.dob ? (student.dob | date:'dd MMM yyyy') : '—' }}</span></div>
+          <div><span class="detail-label">Gender</span><span class="detail-value">{{ student.gender ?? '—' }}</span></div>
+          <div><span class="detail-label">Mobile Number</span><span class="detail-value">{{ student.mobileNumber ?? '—' }}</span></div>
+          <div><span class="detail-label">Email</span><span class="detail-value">{{ student.email ?? '—' }}</span></div>
+          <div style="grid-column: 1 / -1;"><span class="detail-label">Address</span><span class="detail-value">{{ student.address ?? '—' }}</span></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Guardian Information</div>
+        <div class="detail-grid">
+          <div><span class="detail-label">Guardian Name</span><span class="detail-value">{{ student.guardianName ?? '—' }}</span></div>
+          <div><span class="detail-label">Relation</span><span class="detail-value">{{ student.guardianRelation ?? '—' }}</span></div>
+          <div><span class="detail-label">Contact</span><span class="detail-value">{{ student.guardianContact ?? '—' }}</span></div>
+          <div><span class="detail-label">Tuition Fee</span><span class="detail-value">{{ student.tuitionFee ? ('৳' + (student.tuitionFee | number:'1.2-2')) : '—' }}</span></div>
+        </div>
+      </div>
+
+      @if (fatherImageUrl || motherImageUrl) {
+        <div class="detail-section">
+          <div class="detail-section-title">Guardian Photos</div>
+          <div class="detail-photo-row">
+            @if (fatherImageUrl) {
+              <div class="detail-photo-item"><img [src]="fatherImageUrl" alt="Father photo" /><span>Father</span></div>
+            }
+            @if (motherImageUrl) {
+              <div class="detail-photo-item"><img [src]="motherImageUrl" alt="Mother photo" /><span>Mother</span></div>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="detail-section">
+        <div class="detail-section-title">
+          Fee Due Summary
+          <a [routerLink]="['/fees/new']" [queryParams]="{ studentId: student.studentId }" class="btn-outline-light" style="float:right;padding:2px 10px;font-size:12px;">+ Add Payment</a>
+        </div>
+        @if (feeDueLoading) {
+          <div style="padding:12px;color:var(--text-muted);">Loading fee summary...</div>
+        } @else if (feeDueRows.length === 0) {
+          <div style="padding:12px;color:var(--text-muted);">No fee types apply to this student.</div>
+        } @else {
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Fee Type</th>
+                <th>Year</th>
+                <th style="text-align:right;">Assigned</th>
+                <th style="text-align:right;">Paid</th>
+                <th style="text-align:right;">Due</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of feeDueRows; track r.feeMasterId) {
+                <tr>
+                  <td>{{ r.feeType }}</td>
+                  <td>{{ r.applicableYear ?? '—' }}</td>
+                  <td style="text-align:right;">৳{{ r.assigned | number:'1.2-2' }}</td>
+                  <td style="text-align:right;">৳{{ r.paid | number:'1.2-2' }}</td>
+                  <td style="text-align:right;">
+                    @if (r.due < 0) {
+                      <span class="badge badge-success">৳{{ -r.due | number:'1.2-2' }} credit</span>
+                    } @else {
+                      <span class="badge" [ngClass]="r.due > 0 ? 'badge-danger' : 'badge-success'">৳{{ r.due | number:'1.2-2' }}</span>
+                    }
+                  </td>
+                </tr>
+              }
+              <tr style="font-weight:700;">
+                <td colspan="4" style="text-align:right;">Total Due</td>
+                <td style="text-align:right;">৳{{ totalDue | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        }
+      </div>
+    }
+  </div>
+</div>

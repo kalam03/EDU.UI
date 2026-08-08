@@ -39,6 +39,10 @@ export class StudentsListComponent implements OnInit {
     });
   }
 
+  onView(row: Record<string, unknown>): void {
+    this.router.navigate(['/students', row['studentId']]);
+  }
+
   onEdit(row: Record<string, unknown>): void {
     this.router.navigate(['/students', row['studentId'], 'edit']);
   }

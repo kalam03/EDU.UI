@@ -27,8 +27,16 @@ export const routes: Routes = [
         loadComponent: () => import('./features/students/students-form/students-form.component').then(m => m.StudentsFormComponent)
       },
       {
+        path: 'students/promotion',
+        loadComponent: () => import('./features/students/students-promotion/students-promotion.component').then(m => m.StudentsPromotionComponent)
+      },
+      {
         path: 'students/:id/edit',
         loadComponent: () => import('./features/students/students-form/students-form.component').then(m => m.StudentsFormComponent)
+      },
+      {
+        path: 'students/:id',
+        loadComponent: () => import('./features/students/students-detail/students-detail.component').then(m => m.StudentsDetailComponent)
       },
       {
         path: 'staff',

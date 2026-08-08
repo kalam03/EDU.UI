@@ -7,7 +7,7 @@
   align-items: center;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--card);
+  background: var(--card-bg);
   height: 36px;
   transition: border-color 0.2s, box-shadow 0.2s;
   overflow: hidden;
@@ -61,7 +61,7 @@
 .edp-calendar {
   position: fixed;
   z-index: 9999;
-  background: var(--card);
+  background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.13);

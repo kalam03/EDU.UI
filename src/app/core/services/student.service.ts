@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseApiService } from './api.service';
-import { ApiResponse, Student } from '../models';
+import { ApiResponse, Student, PromoteStudentsRequest, PromoteStudentsResult } from '../models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -29,5 +29,10 @@ export class StudentService extends BaseApiService<Student> {
 
   updateMultipart(id: number, fd: FormData): Observable<ApiResponse<Student>> {
     return this.http2.put<ApiResponse<Student>>(`${environment.apiUrl}/students/${id}`, fd);
+  }
+
+  /** Bulk-moves the given students to a new class/section/group. */
+  promote(request: PromoteStudentsRequest): Observable<ApiResponse<PromoteStudentsResult>> {
+    return this.http2.post<ApiResponse<PromoteStudentsResult>>(`${environment.apiUrl}/students/promote`, request);
   }
 }

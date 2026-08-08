@@ -21,7 +21,7 @@
     </button>
   </div>
 
-  <div class="edp-calendar" *ngIf="isOpen"
+  <div class="edp-calendar" *ngIf="isOpen" #calendarPanel
     [style.top.px]="calTop" [style.left.px]="calLeft" [style.width.px]="calWidth">
     <div class="edp-cal-header">
       <button type="button" class="edp-nav" (click)="prevMonth()">&#8249;</button>
