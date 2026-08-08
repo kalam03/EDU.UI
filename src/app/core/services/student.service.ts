@@ -35,4 +35,9 @@ export class StudentService extends BaseApiService<Student> {
   promote(request: PromoteStudentsRequest): Observable<ApiResponse<PromoteStudentsResult>> {
     return this.http2.post<ApiResponse<PromoteStudentsResult>>(`${environment.apiUrl}/students/promote`, request);
   }
+
+  /** Server-rendered (QuestPDF) admission/application form as a downloadable PDF blob. */
+  getAdmissionFormPdf(id: number): Observable<Blob> {
+    return this.http2.get(`${environment.apiUrl}/students/${id}/admission-form/pdf`, { responseType: 'blob' });
+  }
 }

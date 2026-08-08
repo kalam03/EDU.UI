@@ -121,6 +121,36 @@
             }
           </div>
         </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Father's CNIC / NID</label>
+            <input type="text" class="form-control" formControlName="fatherCnic" placeholder="Father's CNIC or NID no." />
+          </div>
+          <div class="form-group">
+            <label>Nationality</label>
+            <input type="text" class="form-control" formControlName="nationality" placeholder="e.g. Bangladeshi" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Father's Occupation</label>
+            <input type="text" class="form-control" formControlName="fatherOccupation" placeholder="Father's occupation" />
+          </div>
+          <div class="form-group">
+            <label>Mother's Occupation</label>
+            <input type="text" class="form-control" formControlName="motherOccupation" placeholder="Mother's occupation" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Father's Education</label>
+            <input type="text" class="form-control" formControlName="fatherEducation" placeholder="Father's education qualification" />
+          </div>
+          <div class="form-group">
+            <label>Mother's Education</label>
+            <input type="text" class="form-control" formControlName="motherEducation" placeholder="Mother's education qualification" />
+          </div>
+        </div>
         <div class="grid-3">
           <div class="form-group">
             <label>Date of Birth <span class="required">*</span></label>
@@ -157,9 +187,23 @@
               style="background:#f7fafc;color:var(--text-muted);cursor:not-allowed;" />
           </div>
         </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Religion</label>
+            <input type="text" class="form-control" formControlName="religion" placeholder="e.g. Islam" />
+          </div>
+          <div class="form-group">
+            <label>Office Phone</label>
+            <input type="tel" class="form-control" formControlName="officePhone" placeholder="Office phone (optional)" />
+          </div>
+        </div>
         <div class="form-group">
-          <label>Address</label>
-          <textarea class="form-control" formControlName="address" rows="2" placeholder="Full address"></textarea>
+          <label>Residential Address</label>
+          <textarea class="form-control" formControlName="address" rows="2" placeholder="Full residential address"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Office Address</label>
+          <textarea class="form-control" formControlName="officeAddress" rows="2" placeholder="Office address (optional)"></textarea>
         </div>
 
         <!-- Academic Information -->
@@ -205,6 +249,10 @@
             <label>Relation</label>
             <input type="text" class="form-control" formControlName="guardianRelation" placeholder="e.g. Father" />
           </div>
+        </div>
+        <div class="form-group">
+          <label>Guardian Address</label>
+          <textarea class="form-control" formControlName="guardianAddress" rows="2" placeholder="Guardian's address (optional)"></textarea>
         </div>
       </div>
 

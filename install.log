@@ -1,0 +1,7 @@
+npm error code ENOTEMPTY
+npm error syscall rename
+npm error path /sessions/bold-great-euler/mnt/EducationManagement/EDU.UI/node_modules/@esbuild/linux-x64
+npm error dest /sessions/bold-great-euler/mnt/EducationManagement/EDU.UI/node_modules/@esbuild/.linux-x64-h5oKCoPN
+npm error errno -39
+npm error ENOTEMPTY: directory not empty, rename '/sessions/bold-great-euler/mnt/EducationManagement/EDU.UI/node_modules/@esbuild/linux-x64' -> '/sessions/bold-great-euler/mnt/EducationManagement/EDU.UI/node_modules/@esbuild/.linux-x64-h5oKCoPN'
+npm error A complete log of this run can be found in: /sessions/bold-great-euler/.npm/_logs/2026-08-08T05_38_36_962Z-debug-0.log

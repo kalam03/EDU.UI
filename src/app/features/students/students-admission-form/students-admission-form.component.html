@@ -3,6 +3,9 @@
     <span class="panel-title">Student Admission Form</span>
     <div class="d-flex gap-2">
       @if (student) {
+        <button type="button" class="btn-outline-light" [disabled]="pdfGenerating" (click)="downloadPdf()">
+          <app-icon name="download" [size]="14"></app-icon> {{ pdfGenerating ? 'Generating...' : 'Download PDF' }}
+        </button>
         <button type="button" class="btn-outline-light" (click)="print()"><app-icon name="printer" [size]="14"></app-icon> Print</button>
       }
       <a [routerLink]="['/students', student?.studentId]" class="btn-outline-light"><app-icon name="arrow-left" [size]="14"></app-icon> Back to Details</a>
@@ -15,84 +18,127 @@
     } @else if (error) {
       <div class="alert alert-danger">{{ error }}</div>
     } @else if (student) {
+      @if (pdfError) { <div class="alert alert-danger no-print">{{ pdfError }}</div> }
+
       <div class="adm-page">
+        <!-- Header: logo, school name/address, cell no, photo box -->
         <div class="adm-header">
-          <div class="adm-school-name">{{ school?.schoolName ?? 'School Name' }}</div>
-          <div class="adm-school-meta">
-            {{ school?.address ?? '' }}
-            @if (school?.schoolEiin) { <span> &nbsp;|&nbsp; EIIN: {{ school?.schoolEiin }}</span> }
+          <div class="adm-logo">SCHOOL<br />LOGO</div>
+          <div class="adm-school">
+            <div class="adm-school-name">{{ (school?.schoolName ?? 'School Name').toUpperCase() }}</div>
+            @if (school?.address) { <div class="adm-school-addr">{{ school?.address }}</div> }
+            @if (school?.phone || school?.principalPhone) {
+              <div class="adm-cell">
+                <strong>Cell No:</strong>
+                {{ school?.phone }}@if (school?.phone && school?.principalPhone) { <span> / </span> }{{ school?.principalPhone }}
+              </div>
+            }
           </div>
-          <div class="adm-form-title">Student Admission Form</div>
-        </div>
-
-        <div class="adm-top">
-          <div class="adm-top-fields">
-            <div class="adm-row">
-              <span class="adm-label">Admission No</span>
-              <span class="adm-value adm-strong">{{ student.admissionNo }}</span>
-              <span class="adm-label">Enrollment Year</span>
-              <span class="adm-value adm-strong">{{ student.enrollmentYear ?? '—' }}</span>
-            </div>
-            <div class="adm-row">
-              <span class="adm-label">Full Name</span>
-              <span class="adm-value adm-strong adm-wide">{{ student.firstName }} {{ student.lastName ?? '' }}</span>
-            </div>
-            <div class="adm-row">
-              <span class="adm-label">Class</span>
-              <span class="adm-value">{{ className }}</span>
-              <span class="adm-label">Section</span>
-              <span class="adm-value">{{ sectionName }}</span>
-            </div>
-            <div class="adm-row">
-              <span class="adm-label">Group</span>
-              <span class="adm-value">{{ groupName }}</span>
-              <span class="adm-label">Gender</span>
-              <span class="adm-value">{{ student.gender ?? '—' }}</span>
-            </div>
-            <div class="adm-row">
-              <span class="adm-label">Date of Birth</span>
-              <span class="adm-value">{{ student.dob ? (student.dob | date:'dd MMM yyyy') : '—' }}</span>
-            </div>
-          </div>
-
           <div class="adm-photo-box">
             @if (studentImageUrl) {
               <img [src]="studentImageUrl" alt="Student photo" />
             } @else {
-              <div class="adm-photo-placeholder"><app-icon name="user" [size]="32"></app-icon></div>
+              <span>Stamp<br />Size<br />Photo</span>
             }
-            <div class="adm-photo-caption">Student Photo</div>
           </div>
         </div>
 
-        <div class="adm-section">
-          <div class="adm-section-title">Family Information</div>
-          <div class="adm-grid">
-            <div><span class="adm-label">Father's Name</span><span class="adm-value">{{ student.fatherName ?? '—' }}</span></div>
-            <div><span class="adm-label">Mother's Name</span><span class="adm-value">{{ student.motherName ?? '—' }}</span></div>
-            <div><span class="adm-label">Mobile Number</span><span class="adm-value">{{ student.mobileNumber ?? '—' }}</span></div>
-            <div><span class="adm-label">Email</span><span class="adm-value">{{ student.email ?? '—' }}</span></div>
-            <div class="adm-full"><span class="adm-label">Address</span><span class="adm-value">{{ student.address ?? '—' }}</span></div>
+        <!-- Admission No box -->
+        <div class="adm-admno-row">
+          <div class="adm-admno-box">
+            <span class="adm-admno-label">Admission No :</span>
+            <span class="adm-admno-value">{{ student.admissionNo }}</span>
           </div>
         </div>
 
-        <div class="adm-section">
-          <div class="adm-section-title">Guardian Information</div>
-          <div class="adm-grid">
-            <div><span class="adm-label">Guardian Name</span><span class="adm-value">{{ student.guardianName ?? '—' }}</span></div>
-            <div><span class="adm-label">Relation</span><span class="adm-value">{{ student.guardianRelation ?? '—' }}</span></div>
-            <div><span class="adm-label">Guardian Contact</span><span class="adm-value">{{ student.guardianContact ?? '—' }}</span></div>
+        <!-- Banner + Session -->
+        <div class="adm-banner-row">
+          <div class="adm-banner">APPLICATION FORM FOR ADMISSION</div>
+          <div class="adm-session">Session : {{ sessionLabel }}</div>
+        </div>
+
+        <!-- Fields -->
+        <div class="adm-fields">
+          <div class="adm-line">
+            <span class="adm-label">Name of Student</span>
+            <span class="adm-blank">{{ student.firstName }} {{ student.lastName ?? '' }}</span>
+          </div>
+          <div class="adm-line">
+            <span class="adm-label">Date Of Birth</span>
+            <span class="adm-blank">{{ student.dob ? (student.dob | date:'dd MMM yyyy') : '' }}</span>
+            <span class="adm-note">(Please attach birth certificate)</span>
+          </div>
+          <div class="adm-line">
+            <span class="adm-label">Father's Name</span>
+            <span class="adm-blank">{{ student.fatherName }}</span>
+          </div>
+          <div class="adm-line">
+            <span class="adm-label">Father's CNIC</span>
+            <span class="adm-blank">{{ student.fatherCnic }}</span>
+          </div>
+          <div class="adm-line">
+            <span class="adm-label">Mother Name</span>
+            <span class="adm-blank">{{ student.motherName }}</span>
+          </div>
+
+          <div class="adm-line adm-two">
+            <span class="adm-label adm-label-fixed">Occupation:</span>
+            <span class="adm-sublabel">Father</span>
+            <span class="adm-blank">{{ student.fatherOccupation }}</span>
+            <span class="adm-sublabel">Mother</span>
+            <span class="adm-blank">{{ student.motherOccupation }}</span>
+          </div>
+          <div class="adm-line adm-two">
+            <span class="adm-label adm-label-fixed">Education qualification of</span>
+            <span class="adm-sublabel">Father</span>
+            <span class="adm-blank">{{ student.fatherEducation }}</span>
+            <span class="adm-sublabel">Mother</span>
+            <span class="adm-blank">{{ student.motherEducation }}</span>
+          </div>
+
+          <div class="adm-line">
+            <span class="adm-label">Address:- Residential</span>
+            <span class="adm-blank">{{ student.address }}</span>
+          </div>
+          <div class="adm-line">
+            <span class="adm-label">Office</span>
+            <span class="adm-blank">{{ student.officeAddress }}</span>
+          </div>
+
+          <div class="adm-line adm-two">
+            <span class="adm-label adm-label-fixed">Phone No:-</span>
+            <span class="adm-sublabel">Residential</span>
+            <span class="adm-blank">{{ student.mobileNumber }}</span>
+            <span class="adm-sublabel">Office</span>
+            <span class="adm-blank">{{ student.officePhone }}</span>
+          </div>
+
+          <div class="adm-line">
+            <span class="adm-label">Name and address of Guardian</span>
+            <span class="adm-blank">
+              {{ student.guardianName }}@if (student.guardianName && student.guardianAddress) { <span>, </span> }{{ student.guardianAddress }}
+            </span>
+          </div>
+
+          <div class="adm-line adm-two">
+            <span class="adm-label adm-label-fixed"></span>
+            <span class="adm-sublabel">Nationality</span>
+            <span class="adm-blank">{{ student.nationality }}</span>
+            <span class="adm-sublabel">Religion</span>
+            <span class="adm-blank">{{ student.religion }}</span>
+          </div>
+
+          <div class="adm-line">
+            <span class="adm-label">Class in which admission sought</span>
+            <span class="adm-blank">{{ className }}@if (sectionName !== '—') { — {{ sectionName }} }</span>
           </div>
         </div>
 
-        <div class="adm-declaration">
-          I hereby declare that the information provided above is true and correct to the best of my knowledge.
-        </div>
-
+        <!-- Signatures -->
         <div class="adm-signatures">
           <div class="adm-sign"><div class="adm-sign-line"></div>Guardian Signature</div>
           <div class="adm-sign"><div class="adm-sign-line"></div>Class Teacher</div>
-          <div class="adm-sign"><div class="adm-sign-line"></div>Principal / Head of Institution</div>
+          <div class="adm-sign"><div class="adm-sign-line"></div>Principal</div>
         </div>
       </div>
     }

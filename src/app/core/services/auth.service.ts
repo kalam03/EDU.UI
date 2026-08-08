@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, map, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { ApiResponse, LoginRequest, LoginResponse } from '../models';
 import { environment } from '../../../environments/environment';
+import { SchoolInfoService } from './school-info.service';
 
 const USER_KEY = 'edu_user';
 
@@ -11,6 +12,7 @@ const USER_KEY = 'edu_user';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private schoolInfoService = inject(SchoolInfoService);
   private apiUrl = environment.apiUrl;
 
   private currentUserSubject = new BehaviorSubject<LoginResponse | null>(this.storedUser());
@@ -31,7 +33,6 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    debugger;
     return this.http.post<ApiResponse<LoginResponse>>(`${this.apiUrl}/auth/login`, credentials).pipe(
       map(res => {
         if (!res.success || !res.data) throw new Error(res.message || 'Login failed');
@@ -43,6 +44,14 @@ export class AuthService {
          localStorage.setItem("edu_token", user.token);
          localStorage.setItem("edu_school_eiin", user.schoolEiin ?? '');
         this.currentUserSubject.next(user);
+
+        // Best-effort pre-warm of the school-info cache (name/address/contact numbers), keyed by
+        // this login's EIIN, so pages like the admission form can read it straight from
+        // localStorage instead of hitting the API every time. If it's already cached from a
+        // previous login this is a no-op; failures here must never block login itself.
+        if (user.schoolEiin) {
+          this.schoolInfoService.ensureCached(user.schoolEiin).subscribe({ error: () => {} });
+        }
       })
     );
   }

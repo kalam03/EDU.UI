@@ -1,112 +1,134 @@
-// A4 = 210mm x 297mm. On screen we render at that width (scaled down by the browser only
-// visually via max-width so it never overflows a narrow viewport); when printed, the @page
-// rule below locks the actual paper size so it always comes out as a true A4 page.
+// A4 = 210mm x 297mm — see @media print below for the actual paper size lock.
 .adm-page {
   width: 210mm;
   min-height: 280mm;
   max-width: 100%;
   margin: 0 auto;
-  padding: 14mm 16mm;
+  padding: 12mm 16mm;
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 6px;
   box-sizing: border-box;
 }
 
+$gold: #b7891f;
+$gold-light: #d4af37;
+
+// ── Header: logo, school name/address, cell no, photo box ─────────────────────
 .adm-header {
-  text-align: center;
-  border-bottom: 2px solid var(--primary);
-  padding-bottom: 10px;
-  margin-bottom: 16px;
-}
-.adm-school-name { font-size: 20px; font-weight: 800; color: var(--primary); }
-.adm-school-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-.adm-form-title {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px dashed var(--border);
-  display: inline-block;
-}
-
-.adm-top {
   display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 18px;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 10px;
 }
-.adm-top-fields { flex: 1; display: flex; flex-direction: column; gap: 8px; }
 
-.adm-row {
+.adm-logo {
+  flex-shrink: 0;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 2px solid $gold-light;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.adm-school { flex: 1; text-align: center; }
+.adm-school-name { font-size: 21px; font-weight: 800; color: var(--primary); letter-spacing: 0.3px; }
+.adm-school-addr { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.adm-cell { font-size: 11.5px; color: var(--text); margin-top: 6px; }
+
+.adm-photo-box {
+  flex-shrink: 0;
+  width: 70px;
+  height: 86px;
+  border: 1.5px solid $gold;
+  background: #fffdf5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+
+  span { font-size: 9px; color: $gold; line-height: 1.4; font-weight: 600; }
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+
+// ── Admission No box ────────────────────────────────────────────────────────
+.adm-admno-row { margin: 10px 0; }
+.adm-admno-box {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  border: 1.2px solid $gold-light;
+  padding: 6px 12px;
+  min-width: 260px;
+}
+.adm-admno-label { font-size: 11.5px; color: var(--text-muted); }
+.adm-admno-value { font-size: 13px; font-weight: 700; color: var(--primary); }
+
+// ── Banner + Session ────────────────────────────────────────────────────────
+.adm-banner-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0 16px;
+}
+.adm-banner {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  padding: 9px 16px;
+  flex: 1.6;
+}
+.adm-session { flex: 1; text-align: right; font-size: 13px; font-weight: 700; color: var(--text); }
+
+// ── Fill-in field lines ─────────────────────────────────────────────────────
+.adm-fields { display: flex; flex-direction: column; gap: 11px; }
+
+.adm-line {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  flex-wrap: wrap;
-  font-size: 13px;
-  padding-bottom: 6px;
-  border-bottom: 1px dotted var(--border);
+  flex-wrap: nowrap;
 }
-.adm-label { color: var(--text-muted); min-width: 90px; }
-.adm-value { color: var(--text); font-weight: 600; margin-right: 18px; }
-.adm-strong { font-size: 14.5px; }
-.adm-wide { flex: 1; }
-
-// The photo box is a fixed, small, passport-photo-style rectangle — not the arbitrary
-// dimensions of whatever file was uploaded. `object-fit: cover` crops/scales any source
-// image (portrait, landscape, or a full A4-shaped scan) so it always fills this exact box
-// neatly, instead of rendering at the photo's own oversized native proportions.
-.adm-photo-box {
-  width: 35mm;
-  height: 45mm;
+.adm-label {
   flex-shrink: 0;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #f8fafc;
-
-  img { width: 100%; height: 100%; object-fit: cover; display: block; }
-}
-.adm-photo-placeholder { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); width: 100%; }
-.adm-photo-caption { font-size: 9.5px; color: var(--text-muted); padding: 3px 0; border-top: 1px solid var(--border); width: 100%; text-align: center; }
-
-.adm-section { margin-bottom: 18px; }
-.adm-section-title {
+  min-width: 165px;
   font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--primary);
-  margin-bottom: 8px;
-  padding-bottom: 4px;
+  color: var(--text);
+}
+.adm-blank {
+  flex: 1;
+  min-height: 15px;
   border-bottom: 1px solid var(--border);
+  padding-bottom: 3px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.adm-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 24px;
+.adm-note { flex-shrink: 0; font-size: 9.5px; font-style: italic; color: var(--text-muted); }
 
-  > div { display: flex; flex-direction: column; gap: 2px; }
-  .adm-full { grid-column: 1 / -1; }
-}
-.adm-grid .adm-label { min-width: 0; }
-.adm-grid .adm-value { margin-right: 0; font-size: 13.5px; }
-
-.adm-declaration {
-  font-size: 11.5px;
-  color: var(--text-muted);
-  font-style: italic;
-  margin: 22px 0 0;
-  padding-top: 12px;
-  border-top: 1px dashed var(--border);
+// Two label/value pairs on one line (Occupation, Education, Phone No, Nationality/Religion).
+// adm-label-fixed uses the SAME min-width as .adm-label above so every row's sub-label
+// ("Father"/"Mother"/"Residential"/"Office"/"Nationality"/"Religion") lines up consistently.
+.adm-two {
+  .adm-label-fixed { min-width: 165px; }
+  .adm-sublabel { flex-shrink: 0; font-size: 12px; color: var(--text); min-width: 55px; }
 }
 
+// ── Signatures: Guardian / Class Teacher / Principal ────────────────────────
 .adm-signatures {
   display: flex;
   justify-content: space-between;
@@ -117,9 +139,12 @@
 .adm-sign-line { border-top: 1px solid var(--text); margin-bottom: 6px; height: 34px; }
 
 @media (max-width: 768px) {
-  .adm-top { flex-direction: column-reverse; align-items: center; }
-  .adm-grid { grid-template-columns: 1fr; }
-  .adm-signatures { flex-direction: column; gap: 20px; }
+  .adm-header { flex-direction: column; align-items: center; text-align: center; }
+  .adm-line, .adm-two { flex-wrap: wrap; }
+  .adm-label { min-width: 100%; }
+  .adm-banner-row { flex-direction: column; align-items: stretch; gap: 6px; }
+  .adm-session { text-align: left; }
+  .adm-signatures { flex-direction: column; gap: 24px; }
 }
 
 @media print {

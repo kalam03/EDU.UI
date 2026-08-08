@@ -137,7 +137,17 @@ export interface Student {
   guardianName?: string;
   guardianContact?: string;
   guardianRelation?: string;
+  guardianAddress?: string;
   tuitionFee?: number;
+  fatherCnic?: string;
+  fatherOccupation?: string;
+  motherOccupation?: string;
+  fatherEducation?: string;
+  motherEducation?: string;
+  officeAddress?: string;
+  officePhone?: string;
+  nationality?: string;
+  religion?: string;
   authStatus?: string;
   schoolEiin?: string;
 }

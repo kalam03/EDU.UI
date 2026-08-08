@@ -48,6 +48,11 @@ export class StudentsFormComponent implements OnInit {
 
   private static readonly MAX_IMAGE_BYTES = 3 * 1024 * 1024;
   private static readonly ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+  // Long-edge cap (px) for uploaded photos. Phone/camera photos are often 3000-8000px on a side;
+  // downscaling to this before preview/upload is what makes a "big" image auto-fit the small
+  // preview card cleanly and keeps the multipart upload small, instead of shipping the original
+  // full-resolution file and relying on CSS alone to crop it down at display time.
+  private static readonly MAX_IMAGE_DIMENSION = 1000;
 
   classOptions:  SelectOption[] = [];
   sectionOptions: SelectOption[] = [];
@@ -86,9 +91,19 @@ export class StudentsFormComponent implements OnInit {
     guardianName:     [''],
     guardianContact:  ['', [Validators.required, Validators.pattern(/^[0-9+\-\s]{7,20}$/)]],
     guardianRelation: [''],
+    guardianAddress:  [''],
     // Tuition fee is not editable here — it's assigned/adjusted from the Fee Management
     // pages (fee types + fee assignment). New students always start at 0 due.
     tuitionFee:       [{ value: 0, disabled: true }],
+    fatherCnic:       [''],
+    fatherOccupation: [''],
+    motherOccupation: [''],
+    fatherEducation:  [''],
+    motherEducation:  [''],
+    officeAddress:    [''],
+    officePhone:      [''],
+    nationality:      [''],
+    religion:         [''],
     schoolEiin:       [this.authService.schoolEiin]
   });
 
@@ -157,7 +172,7 @@ export class StudentsFormComponent implements OnInit {
     });
   }
 
-  onFileSelect(type: 'student' | 'father' | 'mother', event: Event): void {
+  async onFileSelect(type: 'student' | 'father' | 'mother', event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
@@ -167,22 +182,64 @@ export class StudentsFormComponent implements OnInit {
       input.value = '';
       return;
     }
-    if (file.size > StudentsFormComponent.MAX_IMAGE_BYTES) {
-      this.error = 'Image must be under 3 MB.';
+    this.error = '';
+
+    // Downscale large photos before doing anything else with them — this is what makes an
+    // oversized upload "auto fit" instead of needing the user to resize it themselves first.
+    const resized = await this.resizeImage(file);
+
+    if (resized.size > StudentsFormComponent.MAX_IMAGE_BYTES) {
+      this.error = 'Image is still too large even after compression. Please choose a smaller photo.';
       input.value = '';
       return;
     }
-    this.error = '';
 
     const reader = new FileReader();
     reader.onload = e => {
       const preview = e.target?.result as string;
-      if (type === 'student') { this.studentImageFile = file; this.studentImagePreview = preview; this.studentImageRemoved = false; }
-      if (type === 'father')  { this.fatherImageFile  = file; this.fatherImagePreview  = preview; this.fatherImageRemoved  = false; }
-      if (type === 'mother')  { this.motherImageFile  = file; this.motherImagePreview  = preview; this.motherImageRemoved  = false; }
+      if (type === 'student') { this.studentImageFile = resized; this.studentImagePreview = preview; this.studentImageRemoved = false; }
+      if (type === 'father')  { this.fatherImageFile  = resized; this.fatherImagePreview  = preview; this.fatherImageRemoved  = false; }
+      if (type === 'mother')  { this.motherImageFile  = resized; this.motherImagePreview  = preview; this.motherImageRemoved  = false; }
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(resized);
     input.value = '';
+  }
+
+  /**
+   * Shrinks an image to fit within MAX_IMAGE_DIMENSION on its longest edge (aspect ratio
+   * preserved) and re-encodes it as a JPEG, so any huge source photo ends up a small, predictable
+   * size before it ever reaches the preview card or the upload request. Images already within the
+   * cap are returned untouched — no need to re-encode (and potentially lose quality) for a photo
+   * that's already a sane size.
+   */
+  private resizeImage(file: File): Promise<File> {
+    const maxDim = StudentsFormComponent.MAX_IMAGE_DIMENSION;
+    return new Promise(resolve => {
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        let { width, height } = img;
+        if (width <= maxDim && height <= maxDim) { resolve(file); return; }
+
+        const scale = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { resolve(file); return; }
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(blob => {
+          if (!blob) { resolve(file); return; }
+          resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+        }, 'image/jpeg', 0.85);
+      };
+      img.onerror = () => { URL.revokeObjectURL(objectUrl); resolve(file); };
+      img.src = objectUrl;
+    });
   }
 
   removeImage(type: 'student' | 'father' | 'mother'): void {
