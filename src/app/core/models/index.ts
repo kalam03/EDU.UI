@@ -304,6 +304,12 @@ export interface Mark {
   grade?: string;
   authStatus?: string;
   schoolEiin?: string;
+  examName?: string;
+  subjectName?: string;
+  subjectCode?: string;
+  studentName?: string;
+  admissionNo?: string;
+  className?: string;
 }
 
 // ── Fees Master ───────────────────────────────────────────────────────────────

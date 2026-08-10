@@ -155,6 +155,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/marks/marks-form/marks-form.component').then(m => m.MarksFormComponent)
       },
       {
+        path: 'marks/:id/details',
+        loadComponent: () => import('./features/marks/marks-details/marks-details.component').then(m => m.MarksDetailsComponent)
+      },
+      {
         path: 'marks/:id/edit',
         loadComponent: () => import('./features/marks/marks-form/marks-form.component').then(m => m.MarksFormComponent)
       },
@@ -225,4 +229,3 @@ export const routes: Routes = [
     ]
   },
   { path: '**', redirectTo: 'dashboard' }];
-

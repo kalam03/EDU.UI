@@ -1,0 +1,29 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Mark Details</span>
+    <a routerLink="/marks" class="btn-outline-light">&#8592; Back to Marks</a>
+  </div>
+  <div class="panel-body">
+    @if (loading) {
+      <div class="state-message">Loading...</div>
+    } @else if (error) {
+      <div class="alert alert-danger">{{ error }}</div>
+    } @else if (mark) {
+      <div class="details-grid">
+        <div><span class="label">Student</span><strong>{{ mark.studentName || '-' }}</strong></div>
+        <div><span class="label">Admission No.</span><strong>{{ mark.admissionNo || '-' }}</strong></div>
+        <div><span class="label">Class</span><strong>{{ mark.className || '-' }}</strong></div>
+        <div><span class="label">Exam</span><strong>{{ mark.examName || '-' }}</strong></div>
+        <div><span class="label">Subject</span><strong>{{ mark.subjectName || '-' }}</strong></div>
+        <div><span class="label">Subject Code</span><strong>{{ mark.subjectCode || '-' }}</strong></div>
+        <div><span class="label">Written Mark</span><strong>{{ mark.writtenMark ?? '-' }}</strong></div>
+        <div><span class="label">Class Test</span><strong>{{ mark.classTestMark ?? '-' }}</strong></div>
+        <div><span class="label">Homework</span><strong>{{ mark.homeworkMark ?? '-' }}</strong></div>
+        <div><span class="label">Total Obtained</span><strong>{{ mark.obtainTotalMark ?? '-' }}</strong></div>
+        <div><span class="label">Exam Total</span><strong>{{ mark.examTotalMark ?? '-' }}</strong></div>
+        <div><span class="label">Grade</span><strong>{{ mark.grade || '-' }}</strong></div>
+        <div><span class="label">Attendance</span><strong>{{ mark.isAbsent ? 'Absent' : 'Present' }}</strong></div>
+      </div>
+    }
+  </div>
+</div>
